@@ -1,25 +1,20 @@
+import { TreeList } from "@/components/TreeList/TreeList";
 import { returnAssets, returnLocations } from "@/services/apiTractian";
+import { Suspense } from "react";
 
 interface PageProps {
   params: { id: string };
 }
 
 export default async function CustomersPage({ params }: PageProps) {
-  const companies = await returnLocations(params.id);
+  const locations = await returnLocations(params.id);
   const assets = await returnAssets(params.id);
 
   return (
-    <div className="p-4 flex">
-      <div>
-        <h1>Locations</h1>
-
-        <pre>{JSON.stringify(companies, null, 2)}</pre>
-      </div>
-      <div>
-        <h1>Assets</h1>
-
-        <pre>{JSON.stringify(assets, null, 2)}</pre>
-      </div>
-    </div>
+    <main className="flex min-h-screen flex-col w-full px-4">
+      <Suspense fallback={<div>Loading...</div>}>
+        <TreeList locations={locations} assets={assets} />
+      </Suspense>
+    </main>
   );
 }
