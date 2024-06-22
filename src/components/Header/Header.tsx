@@ -1,8 +1,7 @@
 import { returnCompanies } from "@/services/apiTractian";
 
-import Gold from "@/assets/icons/gold.svg";
-import Image from "next/image";
 import Link from "next/link";
+import { CompanyLink } from "../CompanyLink/CompanyLink";
 
 export const Header = async () => {
   const companies = await returnCompanies();
@@ -15,18 +14,7 @@ export const Header = async () => {
 
       <div className="flex gap-4 ">
         {companies.map((company: { id: string; name: string }) => (
-          <Link
-            href={`/companies/${company.id}`}
-            className="flex gap-2 items-center p-2
-             text-white rounded bg-blue-900 
-             hover:bg-blue-800
-             active:bg-blue-700"
-            id={company.id}
-            key={company.id}
-          >
-            <Image src={Gold} width={14} height={14} alt="gold  icon" />
-            {company.name}
-          </Link>
+          <CompanyLink company={company} key={company.id} />
         ))}
       </div>
     </header>
