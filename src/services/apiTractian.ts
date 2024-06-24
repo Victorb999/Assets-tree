@@ -1,5 +1,7 @@
 // https://github.com/tractian/challenges/blob/main/front-end/README.md
 
+import { Asset, Location } from "@/types/returnApiTypes";
+
 export const returnCompanies = async () => {
   const response = await fetch("https://fake-api.tractian.com/companies", {
     method: "GET",
@@ -11,7 +13,7 @@ export const returnCompanies = async () => {
   return data;
 };
 
-export const returnLocations = async (id: string) => {
+export const returnLocations = async (id: string): Promise<Location[]> => {
   const response = await fetch(
     `https://fake-api.tractian.com/companies/${id}/locations`,
     {
@@ -25,7 +27,7 @@ export const returnLocations = async (id: string) => {
   return data;
 };
 
-export const returnAssets = async (id: string) => {
+export const returnAssets = async (id: string): Promise<Asset[]> => {
   const response = await fetch(
     `https://fake-api.tractian.com/companies/${id}/assets`,
     {
