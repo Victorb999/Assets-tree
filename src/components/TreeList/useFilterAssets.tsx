@@ -6,33 +6,10 @@ interface FilterProps {
   assets: Asset[];
 }
 
-const useFilterAssets = ({ locations, assets }: FilterProps) => {
+export const useFilterAssets = ({ locations, assets }: FilterProps) => {
   const [locationsFiltered, setLocationsFiltered] =
     useState<Location[]>(locations);
   const [assetsFiltered, setAssetsFiltered] = useState<Asset[]>(assets);
-
-  const getRelatedIds = (assets: Asset[], idsToShow: Set<string>) => {
-    assets.forEach((asset) => {
-      idsToShow.add(asset.id);
-      if (asset.parentId) {
-        idsToShow.add(asset.parentId);
-      }
-      if (asset.locationId) {
-        idsToShow.add(asset.locationId);
-      }
-    });
-  };
-
-  const getRelatedLocationIds = (
-    locations: Location[],
-    idsToShow: Set<string>,
-  ) => {
-    locations.forEach((location) => {
-      if (location.parentId) {
-        idsToShow.add(location.parentId);
-      }
-    });
-  };
 
   const filterAssets = (value: string) => {
     const lowerCaseValue = value.toLowerCase();
@@ -41,39 +18,54 @@ const useFilterAssets = ({ locations, assets }: FilterProps) => {
     );
   };
 
-  const filterLocations = (idsToShow: Set<string>) => {
-    return locations.filter((location) => idsToShow.has(location.id));
+  const collectRelatedIds = (
+    filteredAssets: Asset[],
+    idsToShow: Set<string>,
+    locationsIdsToShow: Set<string>,
+  ) => {
+    filteredAssets.forEach((asset) => {
+      idsToShow.add(asset.id);
+      if (asset.parentId) {
+        idsToShow.add(asset.parentId);
+      }
+      if (asset.locationId) {
+        locationsIdsToShow.add(asset.locationId);
+      }
+    });
   };
 
   const filterLocationOrAsset = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
 
     if (value.length > 3) {
-      const idsToShow = new Set<string>();
+      const assetIdsToShow = new Set<string>();
+      const locationIdsToShow = new Set<string>();
 
+      // Filtra os assets que correspondem ao valor da pesquisa
       const filteredAssets = filterAssets(value);
-      getRelatedIds(filteredAssets, idsToShow);
+      collectRelatedIds(filteredAssets, assetIdsToShow, locationIdsToShow);
 
-      const relatedAssets = assets.filter((asset) => idsToShow.has(asset.id));
-      getRelatedIds(relatedAssets, idsToShow);
+      // Filtra os assets relacionados
+      const relatedAssets = assets.filter((asset) =>
+        assetIdsToShow.has(asset.id),
+      );
+      collectRelatedIds(relatedAssets, assetIdsToShow, locationIdsToShow);
 
+      // Filtra as localizações relacionadas
       const relatedLocations = locations.filter((location) =>
-        idsToShow.has(location.id),
+        locationIdsToShow.has(location.id),
       );
-      getRelatedLocationIds(relatedLocations, idsToShow);
+      relatedLocations.forEach((location) => {
+        if (location.parentId) {
+          locationIdsToShow.add(location.parentId);
+        }
+      });
 
-      const filteredLocationsToShow = filterLocations(idsToShow);
-      const finalFilteredLocations = locations.filter((location) =>
-        idsToShow.has(location.id),
-      );
-
+      // Atualiza os estados de filtragem
       setAssetsFiltered(relatedAssets);
-      setLocationsFiltered(finalFilteredLocations);
-
-      console.log("filteredAssets", filteredAssets);
-      console.log("idsToShow", Array.from(idsToShow));
-      console.log("filteredAssetsToShow", relatedAssets);
-      console.log("filteredLocationsToShow", filteredLocationsToShow);
+      setLocationsFiltered(
+        locations.filter((location) => locationIdsToShow.has(location.id)),
+      );
     } else {
       setAssetsFiltered(assets);
       setLocationsFiltered(locations);
@@ -86,5 +78,3 @@ const useFilterAssets = ({ locations, assets }: FilterProps) => {
     filterLocationOrAsset,
   };
 };
-
-export default useFilterAssets;
