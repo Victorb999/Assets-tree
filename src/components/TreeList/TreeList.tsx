@@ -6,6 +6,7 @@ import LocationImg from "@/assets/icons/location.svg";
 import ComponentImg from "@/assets/icons/box.svg";
 import AssetImg from "@/assets/icons/cube.svg";
 import { Asset, Location } from "@/types/returnApiTypes";
+import useFilterAssets from "./useFilterAssets";
 
 interface TreeListProps {
   locations: Location[];
@@ -13,8 +14,11 @@ interface TreeListProps {
 }
 
 export const TreeList = ({ locations, assets }: TreeListProps) => {
-  const [locationsFiltered, setLocationsFiltered] = useState(locations);
-  const [assetsFiltered, setAssetsFiltered] = useState(assets);
+  const { locationsFiltered, assetsFiltered, filterLocationOrAsset } =
+    useFilterAssets({ locations, assets });
+
+  console.log(locationsFiltered);
+  console.log(assetsFiltered);
 
   const renderAsset = useCallback((asset: Asset) => {
     return (
@@ -173,25 +177,7 @@ export const TreeList = ({ locations, assets }: TreeListProps) => {
     };
 
     return generateTree(null);
-  }, [returnComponentLocation, returnLocationAsset]);
-
-  const filterLocationOrAsset = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-
-    //const filteredLocations = locations.filter((location) =>
-    // location.name.toLowerCase().includes(value.toLowerCase()),
-    //);
-    if (value.length > 3) {
-      const filteredAssets = assets.filter((asset) =>
-        asset.name.toLowerCase().includes(value.toLowerCase()),
-      );
-      console.log(filteredAssets);
-      //setLocationsFiltered(filteredLocations);
-      setAssetsFiltered(filteredAssets);
-    } else {
-      setAssetsFiltered(assets);
-    }
-  };
+  }, [returnComponentLocation, returnLocationAsset, locationsFiltered]);
 
   return (
     <div className="flex flex-col">

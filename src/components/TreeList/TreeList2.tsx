@@ -14,6 +14,7 @@ interface TreeListProps {
 }
 
 export const TreeList2 = ({ locations, assets }: TreeListProps) => {
+  console.time("begin tree2");
   const { locations: treeLocations, isolatedAssets } = useTreeList({
     locations,
     assets,
@@ -21,7 +22,10 @@ export const TreeList2 = ({ locations, assets }: TreeListProps) => {
 
   const renderAsset = useCallback((asset: Asset) => {
     return (
-      <div key={asset.id} className="flex gap-2 ml-2">
+      <div
+        key={asset.id}
+        className={asset.sensorType ? "flex gap-2 ml-8" : "flex gap-2 ml-4"}
+      >
         <Image
           src={asset.sensorType ? ComponentImg : AssetImg}
           width={22}
@@ -33,30 +37,36 @@ export const TreeList2 = ({ locations, assets }: TreeListProps) => {
     );
   }, []);
 
-  const renderAssets = useCallback((assets: Asset[]) => {
-    return (
-      <div>
-        {assets.map((asset) => (
-          <div key={asset.id} className="flex gap-2 ml-4">
-            {renderAsset(asset)}
-          </div>
-        ))}
-      </div>
-    );
-  }, []);
+  const renderAssets = useCallback(
+    (assets: Asset[]) => {
+      return (
+        <div>
+          {assets.map((asset) => (
+            <div key={asset.id} className="flex gap-2 ml-4">
+              {renderAsset(asset)}
+            </div>
+          ))}
+        </div>
+      );
+    },
+    [renderAsset],
+  );
 
-  const renderSubAssets = useCallback((assets: SubAsset[]) => {
-    return (
-      <div>
-        {assets.map((asset) => (
-          <div key={asset.subAsset.id} className="flex flex-col ml-4">
-            {renderAsset(asset.subAsset)}
-            {renderAssets(asset.componentWithAssets)}
-          </div>
-        ))}
-      </div>
-    );
-  }, []);
+  const renderSubAssets = useCallback(
+    (assets: SubAsset[]) => {
+      return (
+        <div>
+          {assets.map((asset) => (
+            <div key={asset.subAsset.id} className="flex flex-col ml-4">
+              {renderAsset(asset.subAsset)}
+              {renderAssets(asset.componentWithAssets)}
+            </div>
+          ))}
+        </div>
+      );
+    },
+    [renderAsset, renderAssets],
+  );
 
   const renderAssetsWithLocation = useCallback(
     (assets: AssetWithLocation[]) => {
@@ -75,34 +85,37 @@ export const TreeList2 = ({ locations, assets }: TreeListProps) => {
         </div>
       );
     },
-    [],
+    [renderAsset, renderAssets, renderSubAssets],
   );
 
-  const renderTree = useCallback((location: LocationGroup[]) => {
-    return (
-      <div>
-        {location.map((location) => (
-          <div key={location.location.id}>
-            <div className="flex flex-col ml-2">
-              <div className="flex gap-2 ">
-                <Image
-                  src={LocationImg}
-                  width={22}
-                  height={22}
-                  alt="location"
-                />
-                <h3>{location.location.name}</h3>
+  const renderTree = useCallback(
+    (location: LocationGroup[]) => {
+      return (
+        <div>
+          {location.map((location) => (
+            <div key={location.location.id}>
+              <div className="flex flex-col ml-2">
+                <div className="flex gap-2 ">
+                  <Image
+                    src={LocationImg}
+                    width={22}
+                    height={22}
+                    alt="location"
+                  />
+                  <h3>{location.location.name}</h3>
+                </div>
+                {renderTree(location.sublocations)}
+                {renderAssetsWithLocation(location.assetsWithLocation)}
+                {renderAssets(location.componentWithAssets)}
               </div>
-              {renderTree(location.sublocations)}
-              {renderAssetsWithLocation(location.assetsWithLocation)}
-              {renderAssets(location.componentWithAssets)}
             </div>
-          </div>
-        ))}
-      </div>
-    );
-  }, []);
-
+          ))}
+        </div>
+      );
+    },
+    [renderAssets, renderAssetsWithLocation],
+  );
+  console.timeEnd("begin tree2");
   return (
     <div className="p-4 rounded h-min-[80dvh] bg-gray-200 w-[25%] md:w-[40dvw] ">
       {renderTree(treeLocations)}
