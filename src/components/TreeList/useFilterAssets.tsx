@@ -6,7 +6,7 @@ interface FilterProps {
   assets: Asset[];
 }
 
-export const useFilterAssets = ({ locations, assets }: FilterProps) => {
+const useFilterAssets = ({ locations, assets }: FilterProps) => {
   const [locationsFiltered, setLocationsFiltered] =
     useState<Location[]>(locations);
   const [assetsFiltered, setAssetsFiltered] = useState<Asset[]>(assets);
@@ -78,3 +78,5 @@ export const useFilterAssets = ({ locations, assets }: FilterProps) => {
     filterLocationOrAsset,
   };
 };
+
+export default useFilterAssets;
