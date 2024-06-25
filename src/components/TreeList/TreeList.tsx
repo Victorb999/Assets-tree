@@ -52,7 +52,7 @@ export const TreeList = ({ locations, assets }: TreeListProps) => {
         <div>
           {assetsFiltered
             .filter(
-              (asset) => asset.sensorType && asset.locationId === locationId
+              (asset) => asset.sensorType && asset.locationId === locationId,
             )
             .map((asset) => (
               <div key={asset.id}>
@@ -64,7 +64,7 @@ export const TreeList = ({ locations, assets }: TreeListProps) => {
         </div>
       );
     },
-    [assetsFiltered, renderAsset]
+    [assetsFiltered, renderAsset],
   );
 
   const returnComponentAssets = useCallback(
@@ -83,7 +83,7 @@ export const TreeList = ({ locations, assets }: TreeListProps) => {
         </div>
       );
     },
-    [assetsFiltered, renderAsset]
+    [assetsFiltered, renderAsset],
   );
 
   const returnSubAssets = useCallback(
@@ -103,7 +103,7 @@ export const TreeList = ({ locations, assets }: TreeListProps) => {
         </div>
       );
     },
-    [assetsFiltered, renderAsset, returnComponentAssets]
+    [assetsFiltered, renderAsset, returnComponentAssets],
   );
 
   const returnLocationAsset = useCallback(
@@ -112,7 +112,7 @@ export const TreeList = ({ locations, assets }: TreeListProps) => {
         <div>
           {assetsFiltered
             .filter(
-              (asset) => asset.locationId === idLocation && !asset.sensorId
+              (asset) => asset.locationId === idLocation && !asset.sensorId,
             )
             .map((asset) => (
               <div key={asset.id}>
@@ -126,7 +126,7 @@ export const TreeList = ({ locations, assets }: TreeListProps) => {
         </div>
       );
     },
-    [assetsFiltered, renderAsset, returnSubAssets, returnComponentAssets]
+    [assetsFiltered, renderAsset, returnSubAssets, returnComponentAssets],
   );
 
   const memoizedTree = useMemo(() => {
@@ -137,7 +137,7 @@ export const TreeList = ({ locations, assets }: TreeListProps) => {
       }
 
       const locationsTree = locationsFiltered.filter(
-        (location) => location.parentId === parentId
+        (location) => location.parentId === parentId,
       );
 
       const result = (
@@ -177,28 +177,34 @@ export const TreeList = ({ locations, assets }: TreeListProps) => {
 
   const filterLocationOrAsset = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    const filteredLocations = locations.filter((location) =>
-      location.name.toLowerCase().includes(value.toLowerCase())
-    );
-    const filteredAssets = assets.filter((asset) =>
-      asset.name.toLowerCase().includes(value.toLowerCase())
-    );
-    setLocationsFiltered(filteredLocations);
-    setAssetsFiltered(filteredAssets);
+
+    //const filteredLocations = locations.filter((location) =>
+    // location.name.toLowerCase().includes(value.toLowerCase()),
+    //);
+    if (value.length > 3) {
+      const filteredAssets = assets.filter((asset) =>
+        asset.name.toLowerCase().includes(value.toLowerCase()),
+      );
+      console.log(filteredAssets);
+      //setLocationsFiltered(filteredLocations);
+      setAssetsFiltered(filteredAssets);
+    } else {
+      setAssetsFiltered(assets);
+    }
   };
 
   return (
-    <>
+    <div className="flex flex-col">
       <input
         type="text"
         placeholder="Buscar ativo ou local"
-        className="w-[25%]"
+        className="w-[25%] md:w-[40dvw] text-gray-900"
         onChange={(e) => filterLocationOrAsset(e)}
       />
-      <div className="p-4 rounded min-h-[80dvh] bg-gray-200 w-[25%]">
+      <div className="p-4 rounded min-h-[80dvh] bg-gray-400 w-[25%] md:w-[40dvw]">
         {memoizedTree}
         {returnIsolatedAssets()}
       </div>
-    </>
+    </div>
   );
 };
