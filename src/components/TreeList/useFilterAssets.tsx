@@ -18,6 +18,13 @@ const useFilterAssets = ({ locations, assets }: FilterProps) => {
     );
   };
 
+  const filterLocations = (value: string) => {
+    const lowerCaseValue = value.toLowerCase();
+    return locations.filter((location) =>
+      location.name.toLowerCase().includes(lowerCaseValue)
+    );
+  };
+
   const findParentsAssets = useCallback(
     (assets: Asset[], locations: Location[], idsToShow: Set<string>) => {
       assets.forEach((asset) => {
@@ -35,7 +42,7 @@ const useFilterAssets = ({ locations, assets }: FilterProps) => {
           }
         }
       });
-      /* 
+
       locations.forEach((location) => {
         if (
           idsToShow.has(location.id) ||
@@ -45,27 +52,6 @@ const useFilterAssets = ({ locations, assets }: FilterProps) => {
           if (location.parentId) {
             idsToShow.add(location.parentId);
           }
-        }
-      }) */
-    },
-    []
-  );
-
-  const findParentsLocations = useCallback(
-    (locations: Location[], idsToShow: Set<string>) => {
-      idsToShow.forEach((id) => {
-        const obj = locations.find(
-          (obj: Location) => obj.id === id || obj.parentId === id
-        );
-
-        if (obj?.parentId) {
-          idsToShow.add(obj.parentId);
-        }
-        const objSon = assets.find((obj: Location) => obj.parentId === id);
-
-        obj && idsToShow.add(obj?.id);
-        if (objSon) {
-          idsToShow.add(objSon.id);
         }
       });
     },
@@ -99,15 +85,11 @@ const useFilterAssets = ({ locations, assets }: FilterProps) => {
     const value = e.target.value;
 
     if (value.length > 3) {
-      const assestsFound = assets.filter((asset) =>
-        asset.name.toLowerCase().includes(value.toLowerCase())
-      );
+      const assestsFound = filterAssets(value);
 
       console.log("assestsFound", assestsFound);
 
-      const locationsFound = locations.filter((location) =>
-        location.name.toLowerCase().includes(value.toLowerCase())
-      );
+      const locationsFound = filterLocations(value);
       console.log("locationsFound", locationsFound);
 
       const idsToShow = new Set<string>();
@@ -116,10 +98,12 @@ const useFilterAssets = ({ locations, assets }: FilterProps) => {
 
       console.log("idsToShow", idsToShow);
 
-      findParentsAssets(assets, idsToShow);
-      findParentsLocations(locations, idsToShow);
+      // location, asset, component
+      for (let index = 0; index < 3; index++) {
+        findParentsAssets(assets, locations, idsToShow);
+      }
 
-      console.log("locationIdsToShow2", idsToShow);
+      console.log("idsToShow3", idsToShow);
 
       const filteredAssets = assets.filter((asset) => idsToShow.has(asset.id));
       const filteredLocations = locations.filter((location) =>
@@ -127,12 +111,6 @@ const useFilterAssets = ({ locations, assets }: FilterProps) => {
       );
       setAssetsFiltered(filteredAssets);
       setLocationsFiltered(filteredLocations);
-
-      /**
-       * TODO
-       * buscar TODOS filhos das locais e colocar na lista de locais
-       * buscar TODOS filhos dos assets e colocar na lista de assets
-       */
     } else {
       setAssetsFiltered(assets);
       setLocationsFiltered(locations);

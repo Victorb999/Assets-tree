@@ -7,6 +7,7 @@ import AssetImg from "@/assets/icons/cube.svg";
 import { useTreeList } from "./useTreeList";
 import { Asset, Location } from "@/types/returnApiTypes";
 import { LocationGroup, AssetWithLocation, SubAsset } from "@/types/treeTypes";
+import useFilterAssets from "./useFilterAssets";
 
 interface TreeListProps {
   locations: Location[];
@@ -15,9 +16,12 @@ interface TreeListProps {
 
 export const TreeList2 = ({ locations, assets }: TreeListProps) => {
   console.time("begin tree2");
+  const { locationsFiltered, assetsFiltered, filterLocationOrAsset } =
+    useFilterAssets({ locations, assets });
+
   const { locations: treeLocations, isolatedAssets } = useTreeList({
-    locations,
-    assets,
+    locations: locationsFiltered,
+    assets: assetsFiltered,
   });
 
   const renderAsset = useCallback((asset: Asset) => {
@@ -49,7 +53,7 @@ export const TreeList2 = ({ locations, assets }: TreeListProps) => {
         </div>
       );
     },
-    [renderAsset],
+    [renderAsset]
   );
 
   const renderSubAssets = useCallback(
@@ -65,7 +69,7 @@ export const TreeList2 = ({ locations, assets }: TreeListProps) => {
         </div>
       );
     },
-    [renderAsset, renderAssets],
+    [renderAsset, renderAssets]
   );
 
   const renderAssetsWithLocation = useCallback(
@@ -85,7 +89,7 @@ export const TreeList2 = ({ locations, assets }: TreeListProps) => {
         </div>
       );
     },
-    [renderAsset, renderAssets, renderSubAssets],
+    [renderAsset, renderAssets, renderSubAssets]
   );
 
   const renderTree = useCallback(
@@ -113,20 +117,28 @@ export const TreeList2 = ({ locations, assets }: TreeListProps) => {
         </div>
       );
     },
-    [renderAssets, renderAssetsWithLocation],
+    [renderAssets, renderAssetsWithLocation]
   );
   console.timeEnd("begin tree2");
   return (
-    <div className="p-4 rounded h-min-[80dvh] bg-gray-200 w-[25%] md:w-[40dvw] ">
-      {renderTree(treeLocations)}
-      <div>
-        {isolatedAssets.map((asset) => (
-          <div key={asset.id} className="flex gap-2 p-2">
-            {renderAsset(asset)}
-          </div>
-        ))}
+    <div className="flex flex-col">
+      <input
+        type="text"
+        placeholder="Buscar ativo ou local"
+        className="w-[25%] md:w-[40dvw] text-gray-900"
+        onChange={(e) => filterLocationOrAsset(e)}
+      />
+      <div className="p-4 rounded h-min-[80dvh] bg-gray-200 w-[25%] md:w-[40dvw] ">
+        {renderTree(treeLocations)}
+        <div>
+          {isolatedAssets.map((asset) => (
+            <div key={asset.id} className="flex gap-2 p-2">
+              {renderAsset(asset)}
+            </div>
+          ))}
+        </div>
+        <pre>{/*JSON.stringify(treeList, null, 2)*/}</pre>
       </div>
-      <pre>{/*JSON.stringify(treeList, null, 2)*/}</pre>
     </div>
   );
 };
