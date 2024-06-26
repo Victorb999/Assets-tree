@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useCallback, useState } from "react";
 import { Asset, Location } from "@/types/returnApiTypes";
 
 interface FilterProps {
@@ -14,22 +14,83 @@ const useFilterAssets = ({ locations, assets }: FilterProps) => {
   const filterAssets = (value: string) => {
     const lowerCaseValue = value.toLowerCase();
     return assets.filter((asset) =>
-      asset.name.toLowerCase().includes(lowerCaseValue),
+      asset.name.toLowerCase().includes(lowerCaseValue)
     );
   };
 
+  const findParentsAssets = useCallback(
+    (assets: Asset[], locations: Location[], idsToShow: Set<string>) => {
+      assets.forEach((asset) => {
+        if (
+          idsToShow.has(asset.id) ||
+          idsToShow.has(asset?.parentId ?? "") ||
+          idsToShow.has(asset?.locationId ?? "")
+        ) {
+          idsToShow.add(asset.id);
+          if (asset.parentId) {
+            idsToShow.add(asset.parentId);
+          }
+          if (asset.locationId) {
+            idsToShow.add(asset.locationId);
+          }
+        }
+      });
+      /* 
+      locations.forEach((location) => {
+        if (
+          idsToShow.has(location.id) ||
+          idsToShow.has(location?.parentId ?? "")
+        ) {
+          idsToShow.add(location.id);
+          if (location.parentId) {
+            idsToShow.add(location.parentId);
+          }
+        }
+      }) */
+    },
+    []
+  );
+
+  const findParentsLocations = useCallback(
+    (locations: Location[], idsToShow: Set<string>) => {
+      idsToShow.forEach((id) => {
+        const obj = locations.find(
+          (obj: Location) => obj.id === id || obj.parentId === id
+        );
+
+        if (obj?.parentId) {
+          idsToShow.add(obj.parentId);
+        }
+        const objSon = assets.find((obj: Location) => obj.parentId === id);
+
+        obj && idsToShow.add(obj?.id);
+        if (objSon) {
+          idsToShow.add(objSon.id);
+        }
+      });
+    },
+    []
+  );
+
   const collectRelatedIds = (
-    filteredAssets: Asset[],
-    idsToShow: Set<string>,
-    locationsIdsToShow: Set<string>,
+    filteredAsset: Asset[],
+    filteredLocation: Location[],
+    idsToShow: Set<string>
   ) => {
-    filteredAssets.forEach((asset) => {
+    filteredAsset.forEach((asset: any) => {
       idsToShow.add(asset.id);
       if (asset.parentId) {
         idsToShow.add(asset.parentId);
       }
       if (asset.locationId) {
-        locationsIdsToShow.add(asset.locationId);
+        idsToShow.add(asset.locationId);
+      }
+    });
+
+    filteredLocation.forEach((location: Location) => {
+      idsToShow.add(location.id);
+      if (location.parentId) {
+        idsToShow.add(location.parentId);
       }
     });
   };
@@ -38,34 +99,40 @@ const useFilterAssets = ({ locations, assets }: FilterProps) => {
     const value = e.target.value;
 
     if (value.length > 3) {
-      const assetIdsToShow = new Set<string>();
-      const locationIdsToShow = new Set<string>();
-
-      // Filtra os assets que correspondem ao valor da pesquisa
-      const filteredAssets = filterAssets(value);
-      collectRelatedIds(filteredAssets, assetIdsToShow, locationIdsToShow);
-
-      // Filtra os assets relacionados
-      const relatedAssets = assets.filter((asset) =>
-        assetIdsToShow.has(asset.id),
+      const assestsFound = assets.filter((asset) =>
+        asset.name.toLowerCase().includes(value.toLowerCase())
       );
-      collectRelatedIds(relatedAssets, assetIdsToShow, locationIdsToShow);
 
-      // Filtra as localizações relacionadas
-      const relatedLocations = locations.filter((location) =>
-        locationIdsToShow.has(location.id),
-      );
-      relatedLocations.forEach((location) => {
-        if (location.parentId) {
-          locationIdsToShow.add(location.parentId);
-        }
-      });
+      console.log("assestsFound", assestsFound);
 
-      // Atualiza os estados de filtragem
-      setAssetsFiltered(relatedAssets);
-      setLocationsFiltered(
-        locations.filter((location) => locationIdsToShow.has(location.id)),
+      const locationsFound = locations.filter((location) =>
+        location.name.toLowerCase().includes(value.toLowerCase())
       );
+      console.log("locationsFound", locationsFound);
+
+      const idsToShow = new Set<string>();
+
+      collectRelatedIds(assestsFound, locationsFound, idsToShow);
+
+      console.log("idsToShow", idsToShow);
+
+      findParentsAssets(assets, idsToShow);
+      findParentsLocations(locations, idsToShow);
+
+      console.log("locationIdsToShow2", idsToShow);
+
+      const filteredAssets = assets.filter((asset) => idsToShow.has(asset.id));
+      const filteredLocations = locations.filter((location) =>
+        idsToShow.has(location.id)
+      );
+      setAssetsFiltered(filteredAssets);
+      setLocationsFiltered(filteredLocations);
+
+      /**
+       * TODO
+       * buscar TODOS filhos das locais e colocar na lista de locais
+       * buscar TODOS filhos dos assets e colocar na lista de assets
+       */
     } else {
       setAssetsFiltered(assets);
       setLocationsFiltered(locations);

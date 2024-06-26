@@ -17,9 +17,9 @@ export const TreeList = ({ locations, assets }: TreeListProps) => {
   const { locationsFiltered, assetsFiltered, filterLocationOrAsset } =
     useFilterAssets({ locations, assets });
 
-  console.log(locationsFiltered);
+  /*   console.log(locationsFiltered);
   console.log(assetsFiltered);
-
+ */
   const renderAsset = useCallback((asset: Asset) => {
     return (
       <div key={asset.id}>
@@ -29,6 +29,7 @@ export const TreeList = ({ locations, assets }: TreeListProps) => {
             width={22}
             height={22}
             alt={asset.sensorType ? "component" : "asset"}
+            title={`id: ${asset.id} / parentId: ${asset.parentId} / locationId: ${asset.locationId}`}
           />
           <h3>{asset.name}</h3>
         </div>
@@ -56,7 +57,7 @@ export const TreeList = ({ locations, assets }: TreeListProps) => {
         <div>
           {assetsFiltered
             .filter(
-              (asset) => asset.sensorType && asset.locationId === locationId,
+              (asset) => asset.sensorType && asset.locationId === locationId
             )
             .map((asset) => (
               <div key={asset.id}>
@@ -68,7 +69,7 @@ export const TreeList = ({ locations, assets }: TreeListProps) => {
         </div>
       );
     },
-    [assetsFiltered, renderAsset],
+    [assetsFiltered, renderAsset]
   );
 
   const returnComponentAssets = useCallback(
@@ -87,7 +88,7 @@ export const TreeList = ({ locations, assets }: TreeListProps) => {
         </div>
       );
     },
-    [assetsFiltered, renderAsset],
+    [assetsFiltered, renderAsset]
   );
 
   const returnSubAssets = useCallback(
@@ -107,7 +108,7 @@ export const TreeList = ({ locations, assets }: TreeListProps) => {
         </div>
       );
     },
-    [assetsFiltered, renderAsset, returnComponentAssets],
+    [assetsFiltered, renderAsset, returnComponentAssets]
   );
 
   const returnLocationAsset = useCallback(
@@ -116,7 +117,7 @@ export const TreeList = ({ locations, assets }: TreeListProps) => {
         <div>
           {assetsFiltered
             .filter(
-              (asset) => asset.locationId === idLocation && !asset.sensorId,
+              (asset) => asset.locationId === idLocation && !asset.sensorId
             )
             .map((asset) => (
               <div key={asset.id}>
@@ -130,7 +131,7 @@ export const TreeList = ({ locations, assets }: TreeListProps) => {
         </div>
       );
     },
-    [assetsFiltered, renderAsset, returnSubAssets, returnComponentAssets],
+    [assetsFiltered, renderAsset, returnSubAssets, returnComponentAssets]
   );
 
   const memoizedTree = useMemo(() => {
@@ -141,7 +142,7 @@ export const TreeList = ({ locations, assets }: TreeListProps) => {
       }
 
       const locationsTree = locationsFiltered.filter(
-        (location) => location.parentId === parentId,
+        (location) => location.parentId === parentId
       );
 
       const result = (
@@ -161,6 +162,8 @@ export const TreeList = ({ locations, assets }: TreeListProps) => {
                   width={22}
                   height={22}
                   alt="location"
+                  title={`id: ${location.id} - 
+                  parentId: ${location.parentId} `}
                 />
                 <h3>{location.name}</h3>
               </div>
