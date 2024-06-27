@@ -173,36 +173,64 @@ const useFilterAssets = ({ locations, assets }: FilterProps) => {
 
   const filterLocationBySensorType = useCallback(
     (filterByEnergy: boolean) => {
-      console.log("entrou aqui", filterByEnergy);
       if (filterByEnergy) {
+        const idsToShow = new Set<string>();
         const filteredAssets = assets.filter(
           (asset) => asset.sensorType === `energy`
         );
-        console.log("filtering by energy", filteredAssets);
+        collectRelatedIds(filteredAssets, [], idsToShow);
 
-        filterLocationsAndAssets(filteredAssets, []);
+        const finalFilteredAssets = assets.filter((asset) =>
+          idsToShow.has(asset.id)
+        );
+        collectRelatedIds(finalFilteredAssets, [], idsToShow);
+
+        const filteredLocations = locations.filter((location) =>
+          idsToShow.has(location.id)
+        );
+        collectRelatedIds([], filteredLocations, idsToShow);
+
+        const finalFilteredLocations = locations.filter((location) =>
+          idsToShow.has(location.id)
+        );
+
+        setAssetsFiltered(finalFilteredAssets);
+        setLocationsFiltered(finalFilteredLocations);
       } else {
         setAssetsFiltered(assets);
         setLocationsFiltered(locations);
       }
-
-      // TODO
-      // CHANGE TO PICK JUST FATHERS
-      // CHANGE DEPENDENCY BETWEEN FILTERS
     },
     [setAssetsFiltered]
   );
 
   const filterLocationByCritical = useCallback(
     (filterByCritical: boolean) => {
-      console.log("entrou aqui", filterByCritical);
       if (filterByCritical) {
+        const idsToShow = new Set<string>();
         const filteredAssets = assets.filter(
           (asset) => asset.status === `alert`
         );
-        console.log("filtering by critical", filteredAssets);
+        collectRelatedIds(filteredAssets, [], idsToShow);
 
-        filterLocationsAndAssets(filteredAssets, []);
+        const finalFilteredAssets = assets.filter((asset) =>
+          idsToShow.has(asset.id)
+        );
+        collectRelatedIds(finalFilteredAssets, [], idsToShow);
+
+        const filteredLocations = locations.filter((location) =>
+          idsToShow.has(location.id)
+        );
+        collectRelatedIds([], filteredLocations, idsToShow);
+
+        const finalFilteredLocations = locations.filter((location) =>
+          idsToShow.has(location.id)
+        );
+
+        // TODO : improve this code
+
+        setAssetsFiltered(finalFilteredAssets);
+        setLocationsFiltered(finalFilteredLocations);
       } else {
         setAssetsFiltered(assets);
         setLocationsFiltered(locations);
