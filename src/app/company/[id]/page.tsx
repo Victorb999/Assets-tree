@@ -14,11 +14,11 @@ export default async function CustomersPage({ params }: PageProps) {
   const assets = await returnAssets(params.id);
 
   return (
-    <main className="flex w-full px-4">
+    <main className="flex flex-col w-full px-4">
+      <FilterButtons locations={locations} assets={assets} />
       <Suspense fallback={<div>Loading...</div>}>
         <TreeList2 locations={locations} assets={assets} />
       </Suspense>
-      <FilterButtons />
     </main>
   );
 }

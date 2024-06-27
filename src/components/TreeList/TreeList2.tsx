@@ -11,7 +11,14 @@ import Energy from "@/assets/icons/thunder-mini.svg";
 import { useTreeList } from "./useTreeList";
 import { Asset, Location } from "@/types/returnApiTypes";
 import { LocationGroup, AssetWithLocation, SubAsset } from "@/types/treeTypes";
-import useFilterAssets from "./useFilterAssets";
+
+import {
+  assetsFilteredAtom,
+  filterByCriticalAtom,
+  filterByEnergyAtom,
+  locationsFilteredAtom,
+} from "@/store/store";
+import { useAtom } from "jotai";
 
 interface TreeListProps {
   locations: Location[];
@@ -20,8 +27,9 @@ interface TreeListProps {
 
 export const TreeList2 = ({ locations, assets }: TreeListProps) => {
   console.time("begin tree2");
-  const { locationsFiltered, assetsFiltered, filterLocationOrAsset } =
-    useFilterAssets({ locations, assets });
+
+  const [locationsFiltered] = useAtom(locationsFilteredAtom);
+  const [assetsFiltered] = useAtom(assetsFilteredAtom);
 
   const { locations: treeLocations, isolatedAssets } = useTreeList({
     locations: locationsFiltered,
@@ -140,12 +148,6 @@ export const TreeList2 = ({ locations, assets }: TreeListProps) => {
       className="flex flex-col p-4 gap-4
     rounded min-h-[80dvh] bg-gray-600 w-[40%] md:w-[50dvw] "
     >
-      <input
-        type="text"
-        placeholder="Buscar ativo ou local"
-        className="p-2 w-full text-gray-900 rounded bg-gray-200"
-        onChange={(e) => filterLocationOrAsset(e)}
-      />
       <div className="flex flex-col">
         {renderTree(treeLocations)}
         <div>

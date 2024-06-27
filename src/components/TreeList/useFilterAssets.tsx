@@ -16,10 +16,10 @@ interface FilterProps {
 const useFilterAssets = ({ locations, assets }: FilterProps) => {
   /* const [locationsFiltered, setLocationsFiltered] =
     useState<Location[]>(locations); */
+  // const [assetsFiltered, setAssetsFiltered] = useState<Asset[]>(assets);
   const [locationsFiltered, setLocationsFiltered] = useAtom(
     locationsFilteredAtom
   );
-  // const [assetsFiltered, setAssetsFiltered] = useState<Asset[]>(assets);
   const [assetsFiltered, setAssetsFiltered] = useAtom(assetsFilteredAtom);
 
   useEffect(() => {
@@ -31,7 +31,7 @@ const useFilterAssets = ({ locations, assets }: FilterProps) => {
   const [filterByEnergy] = useAtom(filterByEnergyAtom);
 
   useEffect(() => {
-    if (filterByCritical) {
+    /*if (filterByCritical) {
       setAssetsFiltered((prev) =>
         prev.filter((asset) => asset.status === `alert`)
       );
@@ -39,7 +39,8 @@ const useFilterAssets = ({ locations, assets }: FilterProps) => {
       setAssetsFiltered((prev) =>
         prev.filter((asset) => asset.sensorType === `energy`)
       );
-    }
+    }*/
+    //filterLocationBySensorType();
     // TODO resolve this to work properly
   }, [filterByCritical, filterByEnergy, setAssetsFiltered]);
 
@@ -123,13 +124,8 @@ const useFilterAssets = ({ locations, assets }: FilterProps) => {
     [assets, locations]
   );
 
-  const filterLocationOrAsset = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-
-    if (value.length > 3) {
-      const filteredAssets = filterAssets(value);
-      const filteredLocations = filterLocations(value);
-
+  const filterLocationsAndAssets = useCallback(
+    (filteredAssets: Asset[], filteredLocations: Location[]) => {
       const idsToShow = new Set<string>();
       collectRelatedIds(filteredAssets, filteredLocations, idsToShow);
 
@@ -147,16 +143,80 @@ const useFilterAssets = ({ locations, assets }: FilterProps) => {
 
       setAssetsFiltered(finalFilteredAssets);
       setLocationsFiltered(finalFilteredLocations);
-    } else {
-      setAssetsFiltered(assets);
-      setLocationsFiltered(locations);
-    }
-  };
+    },
+    [
+      assets,
+      collectRelatedIds,
+      findParentsAssets,
+      locations,
+      setAssetsFiltered,
+      setLocationsFiltered,
+    ]
+  );
+
+  const filterLocationOrAssetPerName = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+
+      if (value.length > 3) {
+        const filteredAssets = filterAssets(value);
+        const filteredLocations = filterLocations(value);
+
+        filterLocationsAndAssets(filteredAssets, filteredLocations);
+      } else {
+        setAssetsFiltered(assets);
+        setLocationsFiltered(locations);
+      }
+    },
+    []
+  );
+
+  const filterLocationBySensorType = useCallback(
+    (filterByEnergy: boolean) => {
+      console.log("entrou aqui", filterByEnergy);
+      if (filterByEnergy) {
+        const filteredAssets = assets.filter(
+          (asset) => asset.sensorType === `energy`
+        );
+        console.log("filtering by energy", filteredAssets);
+
+        filterLocationsAndAssets(filteredAssets, []);
+      } else {
+        setAssetsFiltered(assets);
+        setLocationsFiltered(locations);
+      }
+
+      // TODO
+      // CHANGE TO PICK JUST FATHERS
+      // CHANGE DEPENDENCY BETWEEN FILTERS
+    },
+    [setAssetsFiltered]
+  );
+
+  const filterLocationByCritical = useCallback(
+    (filterByCritical: boolean) => {
+      console.log("entrou aqui", filterByCritical);
+      if (filterByCritical) {
+        const filteredAssets = assets.filter(
+          (asset) => asset.status === `alert`
+        );
+        console.log("filtering by critical", filteredAssets);
+
+        filterLocationsAndAssets(filteredAssets, []);
+      } else {
+        setAssetsFiltered(assets);
+        setLocationsFiltered(locations);
+      }
+    },
+    [setAssetsFiltered]
+  );
 
   return {
     locationsFiltered,
     assetsFiltered,
-    filterLocationOrAsset,
+    filterLocationOrAssetPerName,
+    filterLocationBySensorType,
+    filterLocationByCritical,
   };
 };
 
