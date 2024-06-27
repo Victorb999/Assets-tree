@@ -2,8 +2,8 @@
 import { FilterButtons } from "@/components/FilterButtons/FilterButtons";
 import { TreeList2 } from "@/components/TreeList/TreeList2";
 
-import { returnAssets, returnLocations } from "@/services/apiTractian";
 import { Suspense } from "react";
+import { returnAssets, returnLocations } from "@/services/apiTractian";
 
 interface PageProps {
   params: { id: string };
@@ -15,9 +15,9 @@ export default async function CustomersPage({ params }: PageProps) {
 
   return (
     <main className="flex flex-col w-full px-4">
-      <FilterButtons locations={locations} assets={assets} />
+      <FilterButtons assets={assets} locations={locations} />
       <Suspense fallback={<div>Loading...</div>}>
-        <TreeList2 locations={locations} assets={assets} />
+        <TreeList2 assets={assets} locations={locations} />
       </Suspense>
     </main>
   );

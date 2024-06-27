@@ -1,7 +1,7 @@
 import { returnCompanies } from "@/services/apiTractian";
 
-import Link from "next/link";
 import { CompanyLink } from "../CompanyLink/CompanyLink";
+import Link from "next/link";
 
 export const Header = async () => {
   const companies = await returnCompanies();

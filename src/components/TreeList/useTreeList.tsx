@@ -1,14 +1,14 @@
 "use client";
-import { useCallback, useMemo } from "react";
 import { Asset, Location } from "@/types/returnApiTypes";
 import { TreeList } from "@/types/treeTypes";
+import { useCallback, useMemo } from "react";
 
 interface TreeListProps {
-  locations: Location[];
   assets: Asset[];
+  locations: Location[];
 }
 
-export const useTreeList = ({ locations, assets }: TreeListProps) => {
+export const useTreeList = ({ assets, locations }: TreeListProps) => {
   const returnComponentLocation = useCallback(
     (locationId: string) => {
       return assets.filter(
@@ -32,8 +32,8 @@ export const useTreeList = ({ locations, assets }: TreeListProps) => {
         .filter((asset) => asset.parentId === assetId && !asset.sensorId)
         .map((asset) => {
           return {
-            subAsset: asset,
             componentWithAssets: returnComponentAssets(asset.id),
+            subAsset: asset,
           };
         });
     },
@@ -47,8 +47,8 @@ export const useTreeList = ({ locations, assets }: TreeListProps) => {
         .map((asset) => {
           return {
             assetWithLocation: asset,
-            subAssets: returnSubAssets(asset.id),
             componentWithAssets: returnComponentAssets(asset.id),
+            subAssets: returnSubAssets(asset.id),
           };
         });
     },
@@ -68,10 +68,10 @@ export const useTreeList = ({ locations, assets }: TreeListProps) => {
 
       const result: any = filteredLocations.map((location) => {
         return {
-          location: location,
-          sublocations: generateTree(location.id),
           assetsWithLocation: returnLocationAsset(location.id),
           componentWithAssets: returnComponentLocation(location.id),
+          location: location,
+          sublocations: generateTree(location.id),
         };
       });
 
@@ -89,8 +89,8 @@ export const useTreeList = ({ locations, assets }: TreeListProps) => {
 
   const treeData: TreeList = useMemo(() => {
     return {
-      locations: memoizedTree,
       isolatedAssets,
+      locations: memoizedTree,
     };
   }, [memoizedTree, isolatedAssets]);
 

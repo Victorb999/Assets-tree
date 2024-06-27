@@ -1,25 +1,25 @@
-import { Location } from "./returnApiTypes";
 import { Asset } from "./returnApiTypes";
+import { Location } from "./returnApiTypes";
 
 export interface TreeList {
-  locations: LocationGroup[];
   isolatedAssets: Asset[];
+  locations: LocationGroup[];
 }
 
 export interface LocationGroup {
-  location: Location;
-  sublocations: LocationGroup[];
   assetsWithLocation: AssetWithLocation[];
   componentWithAssets: Asset[];
+  location: Location;
+  sublocations: LocationGroup[];
 }
 
 export interface AssetWithLocation {
   assetWithLocation: Asset;
-  subAssets: SubAsset[];
   componentWithAssets: Asset[];
+  subAssets: SubAsset[];
 }
 
 export interface SubAsset {
-  subAsset: Asset;
   componentWithAssets: Asset[];
+  subAsset: Asset;
 }

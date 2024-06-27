@@ -5,12 +5,12 @@ export interface Location {
 }
 
 export interface Asset {
+  gatewayId?: string;
   id: string;
   locationId?: string;
   name: string;
   parentId?: string;
+  sensorId?: string;
   sensorType?: string;
   status?: string;
-  gatewayId?: string;
-  sensorId?: string;
 }

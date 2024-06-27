@@ -1,62 +1,52 @@
-import { ChangeEvent, useCallback, useEffect, useState } from "react";
-import { Asset, Location } from "@/types/returnApiTypes";
+import { Asset, Location } from '@/types/returnApiTypes'
+import { ChangeEvent, useCallback, useEffect } from 'react'
 import {
   assetsFilteredAtom,
   filterByCriticalAtom,
   filterByEnergyAtom,
-  locationsFilteredAtom,
-} from "@/store/store";
-import { useAtom } from "jotai";
+  locationsFilteredAtom
+} from '@/store/store'
+import { useAtom } from 'jotai'
 
 interface FilterProps {
-  locations: Location[];
-  assets: Asset[];
+  assets: Asset[]
+  locations: Location[]
 }
 
-const useFilterAssets = ({ locations, assets }: FilterProps) => {
+const useFilterAssets = ({ assets, locations }: FilterProps) => {
   /* const [locationsFiltered, setLocationsFiltered] =
     useState<Location[]>(locations); */
   // const [assetsFiltered, setAssetsFiltered] = useState<Asset[]>(assets);
   const [locationsFiltered, setLocationsFiltered] = useAtom(
     locationsFilteredAtom
-  );
-  const [assetsFiltered, setAssetsFiltered] = useAtom(assetsFilteredAtom);
+  )
+  const [assetsFiltered, setAssetsFiltered] = useAtom(assetsFilteredAtom)
 
   useEffect(() => {
-    setAssetsFiltered(assets);
-    setLocationsFiltered(locations);
-  }, [assets, locations, setAssetsFiltered, setLocationsFiltered]);
-
-  const [filterByCritical] = useAtom(filterByCriticalAtom);
-  const [filterByEnergy] = useAtom(filterByEnergyAtom);
+    setAssetsFiltered(assets)
+    setLocationsFiltered(locations)
+  }, [assets, locations, setAssetsFiltered, setLocationsFiltered])
 
   useEffect(() => {
-    /*if (filterByCritical) {
-      setAssetsFiltered((prev) =>
-        prev.filter((asset) => asset.status === `alert`)
-      );
-    } else if (filterByEnergy) {
-      setAssetsFiltered((prev) =>
-        prev.filter((asset) => asset.sensorType === `energy`)
-      );
-    }*/
-    //filterLocationBySensorType();
-    // TODO resolve this to work properly
-  }, [filterByCritical, filterByEnergy, setAssetsFiltered]);
+    console.log('aqui', assetsFiltered)
+  }, [assetsFiltered, locationsFiltered])
+
+  const [filterByCritical, setFilterByCritical] = useAtom(filterByCriticalAtom)
+  const [filterByEnergy, setFilterByEnergy] = useAtom(filterByEnergyAtom)
 
   const filterAssets = (value: string) => {
-    const lowerCaseValue = value.toLowerCase();
+    const lowerCaseValue = value.toLowerCase()
     return assets.filter((asset) =>
       asset.name.toLowerCase().includes(lowerCaseValue)
-    );
-  };
+    )
+  }
 
   const filterLocations = (value: string) => {
-    const lowerCaseValue = value.toLowerCase();
+    const lowerCaseValue = value.toLowerCase()
     return locations.filter((location) =>
       location.name.toLowerCase().includes(lowerCaseValue)
-    );
-  };
+    )
+  }
 
   const collectRelatedIds = useCallback(
     (
@@ -65,187 +55,236 @@ const useFilterAssets = ({ locations, assets }: FilterProps) => {
       idsToShow: Set<string>
     ) => {
       filteredAssets.forEach((asset) => {
-        idsToShow.add(asset.id);
-        if (asset.parentId) idsToShow.add(asset.parentId);
-        if (asset.locationId) idsToShow.add(asset.locationId);
-      });
+        idsToShow.add(asset.id)
+        if (asset.parentId) idsToShow.add(asset.parentId)
+        if (asset.locationId) idsToShow.add(asset.locationId)
+      })
 
       filteredLocations.forEach((location) => {
-        idsToShow.add(location.id);
-        if (location.parentId) idsToShow.add(location.parentId);
-      });
+        idsToShow.add(location.id)
+        if (location.parentId) idsToShow.add(location.parentId)
+      })
     },
     []
-  );
+  )
 
   const findParentsAssets = useCallback(
     (idsToShow: Set<string>) => {
-      let foundNewIds = false;
+      let foundNewIds = false
 
       assets.forEach((asset) => {
         if (
           idsToShow.has(asset.id) ||
-          idsToShow.has(asset.parentId || "") ||
-          idsToShow.has(asset.locationId || "")
+          idsToShow.has(asset.parentId || '') ||
+          idsToShow.has(asset.locationId || '')
         ) {
           if (!idsToShow.has(asset.id)) {
-            idsToShow.add(asset.id);
-            foundNewIds = true;
+            idsToShow.add(asset.id)
+            foundNewIds = true
           }
           if (asset.parentId && !idsToShow.has(asset.parentId)) {
-            idsToShow.add(asset.parentId);
-            foundNewIds = true;
+            idsToShow.add(asset.parentId)
+            foundNewIds = true
           }
           if (asset.locationId && !idsToShow.has(asset.locationId)) {
-            idsToShow.add(asset.locationId);
-            foundNewIds = true;
+            idsToShow.add(asset.locationId)
+            foundNewIds = true
           }
         }
-      });
+      })
 
       locations.forEach((location) => {
         if (
           idsToShow.has(location.id) ||
-          idsToShow.has(location.parentId || "")
+          idsToShow.has(location.parentId || '')
         ) {
           if (!idsToShow.has(location.id)) {
-            idsToShow.add(location.id);
-            foundNewIds = true;
+            idsToShow.add(location.id)
+            foundNewIds = true
           }
           if (location.parentId && !idsToShow.has(location.parentId)) {
-            idsToShow.add(location.parentId);
-            foundNewIds = true;
+            idsToShow.add(location.parentId)
+            foundNewIds = true
           }
         }
-      });
+      })
 
-      return foundNewIds;
+      return foundNewIds
     },
     [assets, locations]
-  );
+  )
 
-  const filterLocationsAndAssets = useCallback(
-    (filteredAssets: Asset[], filteredLocations: Location[]) => {
-      const idsToShow = new Set<string>();
-      collectRelatedIds(filteredAssets, filteredLocations, idsToShow);
+  const findParentsAssetsButNotBrothers = useCallback(
+    (idsToShow: Set<string>) => {
+      let foundNewIds = false
 
-      let foundNewIds;
-      do {
-        foundNewIds = findParentsAssets(idsToShow);
-      } while (foundNewIds);
+      assets.forEach((asset) => {
+        if (idsToShow.has(asset.id)) {
+          if (!idsToShow.has(asset.id)) {
+            idsToShow.add(asset.id)
+            foundNewIds = true
+          }
+          if (asset.parentId && !idsToShow.has(asset.parentId)) {
+            idsToShow.add(asset.parentId)
+            foundNewIds = true
+          }
+          if (asset.locationId && !idsToShow.has(asset.locationId)) {
+            idsToShow.add(asset.locationId)
+            foundNewIds = true
+          }
+        }
+      })
 
-      const finalFilteredAssets = assets.filter((asset) =>
-        idsToShow.has(asset.id)
-      );
-      const finalFilteredLocations = locations.filter((location) =>
-        idsToShow.has(location.id)
-      );
+      locations.forEach((location) => {
+        if (idsToShow.has(location.id)) {
+          if (!idsToShow.has(location.id)) {
+            idsToShow.add(location.id)
+            foundNewIds = true
+          }
+          if (location.parentId && !idsToShow.has(location.parentId)) {
+            idsToShow.add(location.parentId)
+            foundNewIds = true
+          }
+        }
+      })
 
-      setAssetsFiltered(finalFilteredAssets);
-      setLocationsFiltered(finalFilteredLocations);
+      return foundNewIds
+    },
+    [assets, locations]
+  )
+
+  const filterLocationOrAssetPerName = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value
+
+      if (value.length > 3) {
+        const filteredAssets = filterAssets(value)
+        const filteredLocations = filterLocations(value)
+
+        const idsToShow = new Set<string>()
+        collectRelatedIds(filteredAssets, filteredLocations, idsToShow)
+
+        let foundNewIds
+        do {
+          foundNewIds = findParentsAssets(idsToShow)
+        } while (foundNewIds)
+
+        const finalFilteredAssets = assets.filter((asset) =>
+          idsToShow.has(asset.id)
+        )
+        const finalFilteredLocations = locations.filter((location) =>
+          idsToShow.has(location.id)
+        )
+
+        setAssetsFiltered(finalFilteredAssets)
+        setLocationsFiltered(finalFilteredLocations)
+      } else {
+        setAssetsFiltered(assets)
+        setLocationsFiltered(locations)
+      }
     },
     [
       assets,
       collectRelatedIds,
+      filterAssets,
+      filterLocations,
       findParentsAssets,
       locations,
       setAssetsFiltered,
-      setLocationsFiltered,
+      setLocationsFiltered
     ]
-  );
-
-  const filterLocationOrAssetPerName = useCallback(
-    (e: ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value;
-
-      if (value.length > 3) {
-        const filteredAssets = filterAssets(value);
-        const filteredLocations = filterLocations(value);
-
-        filterLocationsAndAssets(filteredAssets, filteredLocations);
-      } else {
-        setAssetsFiltered(assets);
-        setLocationsFiltered(locations);
-      }
-    },
-    []
-  );
+  )
 
   const filterLocationBySensorType = useCallback(
     (filterByEnergy: boolean) => {
       if (filterByEnergy) {
-        const idsToShow = new Set<string>();
-        const filteredAssets = assets.filter(
+        const idsToShow = new Set<string>()
+        const filteredAssets = assetsFiltered.filter(
           (asset) => asset.sensorType === `energy`
-        );
-        collectRelatedIds(filteredAssets, [], idsToShow);
+        )
+        collectRelatedIds(filteredAssets, [], idsToShow)
+
+        let foundNewIds
+        do {
+          foundNewIds = findParentsAssetsButNotBrothers(idsToShow)
+        } while (foundNewIds)
 
         const finalFilteredAssets = assets.filter((asset) =>
           idsToShow.has(asset.id)
-        );
-        collectRelatedIds(finalFilteredAssets, [], idsToShow);
-
-        const filteredLocations = locations.filter((location) =>
-          idsToShow.has(location.id)
-        );
-        collectRelatedIds([], filteredLocations, idsToShow);
-
+        )
         const finalFilteredLocations = locations.filter((location) =>
           idsToShow.has(location.id)
-        );
+        )
 
-        setAssetsFiltered(finalFilteredAssets);
-        setLocationsFiltered(finalFilteredLocations);
+        setAssetsFiltered(finalFilteredAssets)
+        setLocationsFiltered(finalFilteredLocations)
       } else {
-        setAssetsFiltered(assets);
-        setLocationsFiltered(locations);
+        setFilterByCritical(false)
+        setAssetsFiltered(assets)
+        setLocationsFiltered(locations)
       }
     },
-    [setAssetsFiltered]
-  );
+    [
+      assetsFiltered,
+      collectRelatedIds,
+      assets,
+      locations,
+      setAssetsFiltered,
+      setLocationsFiltered,
+      findParentsAssetsButNotBrothers,
+      setFilterByCritical
+    ]
+  )
 
   const filterLocationByCritical = useCallback(
     (filterByCritical: boolean) => {
       if (filterByCritical) {
-        const idsToShow = new Set<string>();
-        const filteredAssets = assets.filter(
+        const idsToShow = new Set<string>()
+        const filteredAssets = assetsFiltered.filter(
           (asset) => asset.status === `alert`
-        );
-        collectRelatedIds(filteredAssets, [], idsToShow);
+        )
+        collectRelatedIds(filteredAssets, [], idsToShow)
+
+        let foundNewIds
+        do {
+          foundNewIds = findParentsAssetsButNotBrothers(idsToShow)
+        } while (foundNewIds)
 
         const finalFilteredAssets = assets.filter((asset) =>
           idsToShow.has(asset.id)
-        );
-        collectRelatedIds(finalFilteredAssets, [], idsToShow);
-
-        const filteredLocations = locations.filter((location) =>
-          idsToShow.has(location.id)
-        );
-        collectRelatedIds([], filteredLocations, idsToShow);
-
+        )
         const finalFilteredLocations = locations.filter((location) =>
           idsToShow.has(location.id)
-        );
+        )
 
+        setAssetsFiltered(finalFilteredAssets)
+        setLocationsFiltered(finalFilteredLocations)
         // TODO : improve this code
-
-        setAssetsFiltered(finalFilteredAssets);
-        setLocationsFiltered(finalFilteredLocations);
       } else {
-        setAssetsFiltered(assets);
-        setLocationsFiltered(locations);
+        setFilterByEnergy(false)
+        setAssetsFiltered(assets)
+        setLocationsFiltered(locations)
       }
     },
-    [setAssetsFiltered]
-  );
+    [
+      assetsFiltered,
+      collectRelatedIds,
+      assets,
+      locations,
+      setAssetsFiltered,
+      setLocationsFiltered,
+      findParentsAssetsButNotBrothers,
+      setFilterByEnergy
+    ]
+  )
 
   return {
-    locationsFiltered,
     assetsFiltered,
-    filterLocationOrAssetPerName,
-    filterLocationBySensorType,
     filterLocationByCritical,
-  };
-};
+    filterLocationBySensorType,
+    filterLocationOrAssetPerName,
+    locationsFiltered
+  }
+}
 
-export default useFilterAssets;
+export default useFilterAssets

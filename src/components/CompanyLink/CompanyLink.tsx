@@ -1,9 +1,9 @@
 "use client";
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
 
-import Gold from "@/assets/icons/gold.svg";
 import { usePathname } from "next/navigation";
+import Gold from "@/assets/icons/gold.svg";
 
 interface CompanyLinkProps {
   company: {
@@ -16,11 +16,11 @@ export const CompanyLink = ({ company }: CompanyLinkProps) => {
 
   return (
     <Link
-      href={`/company/${company.id}`}
       className="flex gap-2 items-center p-2
      text-white rounded bg-blue-900 
      hover:bg-blue-800
      active:bg-blue-700"
+      href={`/company/${company.id}`}
       id={company.id}
       key={company.id}
       style={
@@ -29,7 +29,7 @@ export const CompanyLink = ({ company }: CompanyLinkProps) => {
           : {}
       }
     >
-      <Image src={Gold} width={14} height={14} alt="gold  icon" />
+      <Image alt="gold  icon" height={14} src={Gold} width={14} />
       {company.name}
     </Link>
   );

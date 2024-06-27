@@ -1,16 +1,16 @@
 "use client";
 import { useCallback } from "react";
-import Image from "next/image";
-import LocationImg from "@/assets/icons/location.svg";
-import ComponentImg from "@/assets/icons/box.svg";
 import AssetImg from "@/assets/icons/cube.svg";
+import ComponentImg from "@/assets/icons/box.svg";
 import DotGreen from "@/assets/icons/dot-green-mini.svg";
 import DotRed from "@/assets/icons/dot-red-mini.svg";
 import Energy from "@/assets/icons/thunder-mini.svg";
+import Image from "next/image";
+import LocationImg from "@/assets/icons/location.svg";
 
-import { useTreeList } from "./useTreeList";
 import { Asset, Location } from "@/types/returnApiTypes";
-import { LocationGroup, AssetWithLocation, SubAsset } from "@/types/treeTypes";
+import { AssetWithLocation, LocationGroup, SubAsset } from "@/types/treeTypes";
+import { useTreeList } from "./useTreeList";
 
 import {
   assetsFilteredAtom,
@@ -21,43 +21,43 @@ import {
 import { useAtom } from "jotai";
 
 interface TreeListProps {
-  locations: Location[];
   assets: Asset[];
+  locations: Location[];
 }
 
-export const TreeList2 = ({ locations, assets }: TreeListProps) => {
+export const TreeList2 = ({ assets, locations }: TreeListProps) => {
   console.time("begin tree2");
 
   const [locationsFiltered] = useAtom(locationsFilteredAtom);
   const [assetsFiltered] = useAtom(assetsFilteredAtom);
 
-  const { locations: treeLocations, isolatedAssets } = useTreeList({
-    locations: locationsFiltered,
+  const { isolatedAssets, locations: treeLocations } = useTreeList({
     assets: assetsFiltered,
+    locations: locationsFiltered,
   });
 
   const renderAsset = useCallback((asset: Asset) => {
     return (
       <div
-        key={asset.id}
         className={asset.sensorType ? "flex gap-2 ml-8" : "flex gap-2 ml-4"}
+        key={asset.id}
       >
         <Image
+          alt={asset.sensorType ? "component" : "asset"}
+          height={22}
           src={asset.sensorType ? ComponentImg : AssetImg}
           width={22}
-          height={22}
-          alt={asset.sensorType ? "component" : "asset"}
         />
         <h3 className="flex gap-2">
           {asset.name}
           {asset.status &&
             (asset.status === "alert" ? (
-              <Image src={DotRed} width={12} height={12} alt="dot red" />
+              <Image alt="dot red" height={12} src={DotRed} width={12} />
             ) : (
-              <Image src={DotGreen} width={12} height={12} alt="dot green" />
+              <Image alt="dot green" height={12} src={DotGreen} width={12} />
             ))}
           {asset.sensorType && asset.sensorType === "energy" && (
-            <Image src={Energy} width={12} height={12} alt="energy" />
+            <Image alt="energy" height={12} src={Energy} width={12} />
           )}
         </h3>
       </div>
@@ -69,7 +69,7 @@ export const TreeList2 = ({ locations, assets }: TreeListProps) => {
       return (
         <div>
           {assets.map((asset) => (
-            <div key={asset.id} className="flex gap-2 ml-4">
+            <div className="flex gap-2 ml-4" key={asset.id}>
               {renderAsset(asset)}
             </div>
           ))}
@@ -84,7 +84,7 @@ export const TreeList2 = ({ locations, assets }: TreeListProps) => {
       return (
         <div>
           {assets.map((asset) => (
-            <div key={asset.subAsset.id} className="flex flex-col ml-4">
+            <div className="flex flex-col ml-4" key={asset.subAsset.id}>
               {renderAsset(asset.subAsset)}
               {renderAssets(asset.componentWithAssets)}
             </div>
@@ -101,8 +101,8 @@ export const TreeList2 = ({ locations, assets }: TreeListProps) => {
         <div>
           {assets.map((asset) => (
             <div
-              key={asset.assetWithLocation.id}
               className="flex flex-col ml-4"
+              key={asset.assetWithLocation.id}
             >
               {renderAsset(asset.assetWithLocation)}
               {renderSubAssets(asset.subAssets)}
@@ -124,10 +124,10 @@ export const TreeList2 = ({ locations, assets }: TreeListProps) => {
               <div className="flex flex-col ml-2">
                 <div className="flex gap-2 ">
                   <Image
+                    alt="location"
+                    height={22}
                     src={LocationImg}
                     width={22}
-                    height={22}
-                    alt="location"
                   />
                   <h3>{location.location.name}</h3>
                 </div>
@@ -152,7 +152,7 @@ export const TreeList2 = ({ locations, assets }: TreeListProps) => {
         {renderTree(treeLocations)}
         <div>
           {isolatedAssets.map((asset) => (
-            <div key={asset.id} className="flex gap-2 p-2">
+            <div className="flex gap-2 p-2" key={asset.id}>
               {renderAsset(asset)}
             </div>
           ))}

@@ -1,0 +1,44 @@
+{
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "next/core-web-vitals",
+    "react-app",
+    "prettier"
+  ],
+  "plugins": [
+    "sort-imports-es6-autofix",
+    "sort-destructure-keys",
+    "eslint-plugin-sort-keys-fix",
+    "typescript-sort-keys"
+  ],
+  "rules": {
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      { "vars": "all", "args": "after-used", "ignoreRestSiblings": false }
+    ],
+    "comma-dangle": "off",
+    "dot-notation": "error",
+    "import/no-anonymous-default-export": ["error", { "allowObject": true }],
+    "indent": "off",
+    "no-empty": "off",
+    "no-prototype-builtins": "off",
+    "no-var": "error",
+    "prefer-const": "error",
+    "prefer-spread": "error",
+    "prefer-template": "error",
+    "react/jsx-boolean-value": ["error", "never"],
+    "react/jsx-sort-props": ["error", { "ignoreCase": true }],
+    "react/no-unknown-property": "error",
+    "react/prop-types": "off",
+    "react/react-in-jsx-scope": "off",
+    "react/sort-comp": "warn",
+    "sort-destructure-keys/sort-destructure-keys": "warn",
+    "sort-keys-fix/sort-keys-fix": "warn",
+    "sort-imports-es6-autofix/sort-imports-es6": "warn",
+    "sort-vars": "warn",
+    "template-curly-spacing": "off",
+    "typescript-sort-keys/interface": "warn",
+    "typescript-sort-keys/string-enum": "warn"
+  }
+}

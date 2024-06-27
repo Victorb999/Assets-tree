@@ -2,20 +2,20 @@
 import { ChangeEvent, useCallback, useMemo, useState } from "react";
 import Image from "next/image";
 
-import LocationImg from "@/assets/icons/location.svg";
-import ComponentImg from "@/assets/icons/box.svg";
-import AssetImg from "@/assets/icons/cube.svg";
 import { Asset, Location } from "@/types/returnApiTypes";
+import AssetImg from "@/assets/icons/cube.svg";
+import ComponentImg from "@/assets/icons/box.svg";
+import LocationImg from "@/assets/icons/location.svg";
 import useFilterAssets from "./useFilterAssets";
 
 interface TreeListProps {
-  locations: Location[];
   assets: Asset[];
+  locations: Location[];
 }
 
-export const TreeList = ({ locations, assets }: TreeListProps) => {
-  const { locationsFiltered, assetsFiltered, filterLocationOrAsset } =
-    useFilterAssets({ locations, assets });
+export const TreeList = ({ assets, locations }: TreeListProps) => {
+  const { assetsFiltered, filterLocationOrAsset, locationsFiltered } =
+    useFilterAssets({ assets, locations });
 
   /*   console.log(locationsFiltered);
   console.log(assetsFiltered);
@@ -25,11 +25,11 @@ export const TreeList = ({ locations, assets }: TreeListProps) => {
       <div key={asset.id}>
         <div className="flex gap-2 pl-4">
           <Image
-            src={asset.sensorType ? ComponentImg : AssetImg}
-            width={22}
-            height={22}
             alt={asset.sensorType ? "component" : "asset"}
+            height={22}
+            src={asset.sensorType ? ComponentImg : AssetImg}
             title={`id: ${asset.id} / parentId: ${asset.parentId} / locationId: ${asset.locationId}`}
+            width={22}
           />
           <h3>{asset.name}</h3>
         </div>
@@ -149,21 +149,21 @@ export const TreeList = ({ locations, assets }: TreeListProps) => {
         <div>
           {locationsTree.map((location) => (
             <div
-              key={location.id}
               className={
                 location.parentId
                   ? "p-2 ml-4 border-l-2 border-gray-600"
                   : "pl-2"
               }
+              key={location.id}
             >
               <div className="flex gap-2">
                 <Image
-                  src={LocationImg}
-                  width={22}
-                  height={22}
                   alt="location"
+                  height={22}
+                  src={LocationImg}
                   title={`id: ${location.id} - 
                   parentId: ${location.parentId} `}
+                  width={22}
                 />
                 <h3>{location.name}</h3>
               </div>
@@ -185,10 +185,10 @@ export const TreeList = ({ locations, assets }: TreeListProps) => {
   return (
     <div className="flex flex-col">
       <input
-        type="text"
-        placeholder="Buscar ativo ou local"
         className="w-[25%] md:w-[40dvw] text-gray-900"
         onChange={(e) => filterLocationOrAsset(e)}
+        placeholder="Buscar ativo ou local"
+        type="text"
       />
       <div className="p-4 rounded min-h-[80dvh] bg-gray-400 w-[25%] md:w-[40dvw]">
         {memoizedTree}

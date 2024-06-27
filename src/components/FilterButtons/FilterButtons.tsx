@@ -1,28 +1,28 @@
 "use client";
-import Energy from "@/assets/icons/thunder.svg";
-import Critical from "@/assets/icons/warning.svg";
+import { Asset, Location } from "@/types/returnApiTypes";
 import { filterByCriticalAtom, filterByEnergyAtom } from "@/store/store";
 import { useAtom } from "jotai";
+import Critical from "@/assets/icons/warning.svg";
+import Energy from "@/assets/icons/thunder.svg";
 import Image from "next/image";
-import { Asset, Location } from "@/types/returnApiTypes";
 import useFilterAssets from "@/components/TreeList/useFilterAssets";
 
 interface FilterButtonsProps {
-  locations: Location[];
   assets: Asset[];
+  locations: Location[];
 }
 
-export const FilterButtons = ({ locations, assets }: FilterButtonsProps) => {
+export const FilterButtons = ({ assets, locations }: FilterButtonsProps) => {
   const [filterByEnergy, setFilterByEnergy] = useAtom(filterByEnergyAtom);
   const [filterByCritical, setFilterByCritical] = useAtom(filterByCriticalAtom);
 
   const {
-    filterLocationOrAssetPerName,
-    filterLocationBySensorType,
     filterLocationByCritical,
+    filterLocationBySensorType,
+    filterLocationOrAssetPerName,
   } = useFilterAssets({
-    locations,
     assets,
+    locations,
   });
 
   const handleFilterByEnergy = () => {
@@ -38,10 +38,10 @@ export const FilterButtons = ({ locations, assets }: FilterButtonsProps) => {
   return (
     <div className="flex gap-2 items-center justify-between">
       <input
-        type="text"
-        placeholder="Buscar ativo ou local"
         className="p-2 w-full text-gray-900 rounded bg-gray-200 w-[40%] md:w-[50dvw] "
         onChange={(e) => filterLocationOrAssetPerName(e)}
+        placeholder="Buscar ativo ou local"
+        type="text"
       />
 
       <div className="flex gap-2">
@@ -49,35 +49,35 @@ export const FilterButtons = ({ locations, assets }: FilterButtonsProps) => {
           className="flex gap-2 h-10 px-2
        items-center justify-center rounded border 
         border-gray-400"
-          title="energy"
+          onClick={() => handleFilterByEnergy()}
           style={
             filterByEnergy
               ? { backgroundColor: "rgb(29 78 216)", color: "white" }
               : {}
           }
-          onClick={() => handleFilterByEnergy()}
+          title="energy"
         >
-          <Image src={Energy} alt="energy" width={16} height={16} /> Sensor de
+          <Image alt="energy" height={16} src={Energy} width={16} /> Sensor de
           energia
         </button>
         <button
           className="flex gap-2 h-10 px-2
       items-center justify-center rounded border 
        border-gray-400"
-          title="critical"
+          onClick={() => handleFilterByCritical()}
           style={
             filterByCritical
               ? { backgroundColor: "rgb(29 78 216)", color: "white" }
               : {}
           }
-          onClick={() => handleFilterByCritical()}
+          title="critical"
         >
           <Image
-            src={Critical}
             alt="critical"
-            width={16}
             height={16}
+            src={Critical}
             style={filterByCritical ? { fill: "#fff" } : {}}
+            width={16}
           />
           Critico
         </button>
