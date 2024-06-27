@@ -4,6 +4,10 @@ import Image from "next/image";
 import LocationImg from "@/assets/icons/location.svg";
 import ComponentImg from "@/assets/icons/box.svg";
 import AssetImg from "@/assets/icons/cube.svg";
+import DotGreen from "@/assets/icons/dot-green-mini.svg";
+import DotRed from "@/assets/icons/dot-red-mini.svg";
+import Energy from "@/assets/icons/thunder-mini.svg";
+
 import { useTreeList } from "./useTreeList";
 import { Asset, Location } from "@/types/returnApiTypes";
 import { LocationGroup, AssetWithLocation, SubAsset } from "@/types/treeTypes";
@@ -36,7 +40,18 @@ export const TreeList2 = ({ locations, assets }: TreeListProps) => {
           height={22}
           alt={asset.sensorType ? "component" : "asset"}
         />
-        <h3>{asset.name}</h3>
+        <h3 className="flex gap-2">
+          {asset.name}
+          {asset.status &&
+            (asset.status === "alert" ? (
+              <Image src={DotRed} width={12} height={12} alt="dot red" />
+            ) : (
+              <Image src={DotGreen} width={12} height={12} alt="dot green" />
+            ))}
+          {asset.sensorType && asset.sensorType === "energy" && (
+            <Image src={Energy} width={12} height={12} alt="energy" />
+          )}
+        </h3>
       </div>
     );
   }, []);
@@ -121,14 +136,17 @@ export const TreeList2 = ({ locations, assets }: TreeListProps) => {
   );
   console.timeEnd("begin tree2");
   return (
-    <div className="flex flex-col">
+    <div
+      className="flex flex-col p-4 gap-4
+    rounded min-h-[80dvh] bg-gray-600 w-[40%] md:w-[50dvw] "
+    >
       <input
         type="text"
         placeholder="Buscar ativo ou local"
-        className="w-[25%] md:w-[40dvw] text-gray-900"
+        className="p-2 w-full text-gray-900 rounded bg-gray-200"
         onChange={(e) => filterLocationOrAsset(e)}
       />
-      <div className="p-4 rounded h-min-[80dvh] bg-gray-200 w-[25%] md:w-[40dvw] ">
+      <div className="flex flex-col">
         {renderTree(treeLocations)}
         <div>
           {isolatedAssets.map((asset) => (
