@@ -1,10 +1,6 @@
 'use client'
-import { Suspense, useCallback, useDeferredValue, useMemo } from 'react'
-import AssetImg from '@/assets/icons/cube.svg'
-import ComponentImg from '@/assets/icons/box.svg'
-import DotGreen from '@/assets/icons/dot-green-mini.svg'
-import DotRed from '@/assets/icons/dot-red-mini.svg'
-import Energy from '@/assets/icons/thunder-mini.svg'
+import { useCallback, useMemo } from 'react'
+
 import Image from 'next/image'
 import LocationImg from '@/assets/icons/location.svg'
 
@@ -14,7 +10,8 @@ import { useTreeList } from './useTreeList'
 
 import { assetsFilteredAtom, locationsFilteredAtom } from '@/store/store'
 import { useAtom } from 'jotai'
-import { RenderTree } from './RenderTree'
+
+import { AssetItem } from '@/components/AssetItem/AssetItem'
 
 export const TreeList2 = () => {
   console.time('begin tree2')
@@ -27,48 +24,17 @@ export const TreeList2 = () => {
     locations: locationsFiltered
   })
 
-  const renderAsset = useCallback((asset: Asset) => {
+  const renderAssets = useCallback((assets: Asset[]) => {
     return (
-      <div
-        className={asset.sensorType ? 'flex gap-2 ml-8' : 'flex gap-2 ml-4'}
-        key={asset.id}
-      >
-        <Image
-          alt={asset.sensorType ? 'component' : 'asset'}
-          height={22}
-          src={asset.sensorType ? ComponentImg : AssetImg}
-          width={22}
-        />
-        <h3 className="flex gap-2">
-          {asset.name}
-          {asset.status &&
-            (asset.status === 'alert' ? (
-              <Image alt="dot red" height={12} src={DotRed} width={12} />
-            ) : (
-              <Image alt="dot green" height={12} src={DotGreen} width={12} />
-            ))}
-          {asset.sensorType && asset.sensorType === 'energy' && (
-            <Image alt="energy" height={12} src={Energy} width={12} />
-          )}
-        </h3>
+      <div>
+        {assets.map((asset) => (
+          <div className="flex gap-2 ml-4" key={asset.id}>
+            <AssetItem asset={asset} />
+          </div>
+        ))}
       </div>
     )
   }, [])
-
-  const renderAssets = useCallback(
-    (assets: Asset[]) => {
-      return (
-        <div>
-          {assets.map((asset) => (
-            <div className="flex gap-2 ml-4" key={asset.id}>
-              {renderAsset(asset)}
-            </div>
-          ))}
-        </div>
-      )
-    },
-    [renderAsset]
-  )
 
   const renderSubAssets = useCallback(
     (assets: SubAsset[]) => {
@@ -76,14 +42,14 @@ export const TreeList2 = () => {
         <div>
           {assets.map((asset) => (
             <div className="flex flex-col ml-4" key={asset.subAsset.id}>
-              {renderAsset(asset.subAsset)}
+              <AssetItem asset={asset.subAsset} />
               {renderAssets(asset.componentWithAssets)}
             </div>
           ))}
         </div>
       )
     },
-    [renderAsset, renderAssets]
+    [renderAssets]
   )
 
   const renderAssetsWithLocation = useCallback(
@@ -95,7 +61,7 @@ export const TreeList2 = () => {
               className="flex flex-col ml-4"
               key={asset.assetWithLocation.id}
             >
-              {renderAsset(asset.assetWithLocation)}
+              <AssetItem asset={asset.assetWithLocation} />
               {renderSubAssets(asset.subAssets)}
               {renderAssets(asset.componentWithAssets)}
             </div>
@@ -103,7 +69,7 @@ export const TreeList2 = () => {
         </div>
       )
     },
-    [renderAsset, renderAssets, renderSubAssets]
+    [renderAssets, renderSubAssets]
   )
 
   const memoizedRenderTree = useMemo(() => {
@@ -134,26 +100,29 @@ export const TreeList2 = () => {
     return renderTree
   }, [renderAssets, renderAssetsWithLocation])
 
+  // TODO :
+  // LOADINGS e msg de nenhum asset
+  // performace
+  // tela inicial
+  // Fechar combo
+  // video
+
   console.timeEnd('begin tree2')
   return (
-    <div
+    <main
       className="flex flex-col p-4 gap-4
-    rounded min-h-[80dvh] bg-gray-600 w-[40%] md:w-[50dvw] "
+    rounded min-h-[80dvh] w-[40%] md:w-[50dvw] border border-gray-700"
     >
       <div className="flex flex-col">
-        <RenderTree
-          location={treeLocations}
-          renderAssets={renderAssets}
-          renderAssetsWithLocation={renderAssetsWithLocation}
-        />
+        {memoizedRenderTree(treeLocations)}
         <div>
           {isolatedAssets.map((asset) => (
             <div className="flex gap-2 p-2" key={asset.id}>
-              {renderAsset(asset)}
+              <AssetItem asset={asset} />
             </div>
           ))}
         </div>
       </div>
-    </div>
+    </main>
   )
 }

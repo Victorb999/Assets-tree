@@ -1,6 +1,7 @@
 import { Asset, Location } from '@/types/returnApiTypes'
 import { ChangeEvent, useCallback, useEffect } from 'react'
 import {
+  assetSelectedAtom,
   assetsFilteredAtom,
   filterByCriticalAtom,
   filterByEnergyAtom,
@@ -18,7 +19,7 @@ const useFilterAssets = ({ assets, locations }: FilterProps) => {
     locationsFilteredAtom
   )
   const [assetsFiltered, setAssetsFiltered] = useAtom(assetsFilteredAtom)
-
+  const [, setAssetSelected] = useAtom(assetSelectedAtom)
   useEffect(() => {
     setAssetsFiltered(assets)
     setLocationsFiltered(locations)
@@ -30,6 +31,7 @@ const useFilterAssets = ({ assets, locations }: FilterProps) => {
   const resetfilters = () => {
     setFilterByCritical(false)
     setFilterByEnergy(false)
+    setAssetSelected(null)
   }
 
   useEffect(() => {
@@ -181,6 +183,7 @@ const useFilterAssets = ({ assets, locations }: FilterProps) => {
         setAssetsFiltered(finalFilteredAssets)
         setLocationsFiltered(finalFilteredLocations)
       } else {
+        setAssetSelected(null)
         setAssetsFiltered(assets)
         setLocationsFiltered(locations)
       }
@@ -221,7 +224,7 @@ const useFilterAssets = ({ assets, locations }: FilterProps) => {
         setAssetsFiltered(finalFilteredAssets)
         setLocationsFiltered(finalFilteredLocations)
       } else {
-        setFilterByCritical(false)
+        resetfilters()
         setAssetsFiltered(assets)
         setLocationsFiltered(locations)
       }
@@ -263,7 +266,7 @@ const useFilterAssets = ({ assets, locations }: FilterProps) => {
         setLocationsFiltered(finalFilteredLocations)
         // TODO : improve this code
       } else {
-        setFilterByEnergy(false)
+        resetfilters()
         setAssetsFiltered(assets)
         setLocationsFiltered(locations)
       }

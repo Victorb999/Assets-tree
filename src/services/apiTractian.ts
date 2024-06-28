@@ -39,6 +39,5 @@ export const returnAssets = async (id: string): Promise<Asset[]> => {
     }
   )
   const data = await response.json()
-  console.timeEnd('demora2')
   return data
 }

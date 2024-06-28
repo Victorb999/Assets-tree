@@ -6,3 +6,5 @@ export const filterByEnergyAtom = atom(false)
 
 export const assetsFilteredAtom = atom<Asset[]>([])
 export const locationsFilteredAtom = atom<Location[]>([])
+
+export const assetSelectedAtom = atom<Asset | null>(null)

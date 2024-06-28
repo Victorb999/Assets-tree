@@ -36,7 +36,7 @@ export const FilterButtons = ({ assets, locations }: FilterButtonsProps) => {
   }
 
   return (
-    <div className="flex gap-2 items-center justify-between">
+    <div className="flex gap-2 items-center justify-between border border-gray-700 p-2 rounded">
       <input
         className="p-2 text-gray-900 rounded bg-gray-200 w-[40%] md:w-[50dvw] "
         onChange={(e) => filterLocationOrAssetPerName(e)}
