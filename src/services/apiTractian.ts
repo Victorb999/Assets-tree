@@ -1,42 +1,44 @@
 // https://github.com/tractian/challenges/blob/main/front-end/README.md
 
-import { Asset, Location } from "@/types/returnApiTypes";
+import { Asset, Location } from '@/types/returnApiTypes'
 
 export const returnCompanies = async () => {
-  const response = await fetch("https://fake-api.tractian.com/companies", {
+  const response = await fetch('https://fake-api.tractian.com/companies', {
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json'
     },
-    method: "GET",
-  });
-  const data = await response.json();
-  return data;
-};
+    method: 'GET'
+  })
+  const data = await response.json()
+  return data
+}
 
 export const returnLocations = async (id: string): Promise<Location[]> => {
   const response = await fetch(
     `https://fake-api.tractian.com/companies/${id}/locations`,
     {
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json'
       },
-      method: "GET",
+      method: 'GET'
     }
-  );
-  const data = await response.json();
-  return data;
-};
+  )
+  const data = await response.json()
+  return data
+}
 
 export const returnAssets = async (id: string): Promise<Asset[]> => {
+  console.time('demora2')
   const response = await fetch(
     `https://fake-api.tractian.com/companies/${id}/assets`,
     {
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json'
       },
-      method: "GET",
+      method: 'GET'
     }
-  );
-  const data = await response.json();
-  return data;
-};
+  )
+  const data = await response.json()
+  console.timeEnd('demora2')
+  return data
+}

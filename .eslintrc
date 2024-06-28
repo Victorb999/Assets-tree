@@ -3,18 +3,18 @@
     "eslint:recommended",
     "plugin:react/recommended",
     "next/core-web-vitals",
-    "react-app",
     "prettier"
   ],
   "plugins": [
     "sort-imports-es6-autofix",
     "sort-destructure-keys",
     "eslint-plugin-sort-keys-fix",
-    "typescript-sort-keys"
+    "typescript-sort-keys",
+    "@typescript-eslint"
   ],
   "rules": {
     "@typescript-eslint/no-unused-vars": [
-      "error",
+      "warn",
       { "vars": "all", "args": "after-used", "ignoreRestSiblings": false }
     ],
     "comma-dangle": "off",

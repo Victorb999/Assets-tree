@@ -1,44 +1,44 @@
-"use client";
-import { Asset, Location } from "@/types/returnApiTypes";
-import { filterByCriticalAtom, filterByEnergyAtom } from "@/store/store";
-import { useAtom } from "jotai";
-import Critical from "@/assets/icons/warning.svg";
-import Energy from "@/assets/icons/thunder.svg";
-import Image from "next/image";
-import useFilterAssets from "@/components/TreeList/useFilterAssets";
+'use client'
+import { Asset, Location } from '@/types/returnApiTypes'
+import { filterByCriticalAtom, filterByEnergyAtom } from '@/store/store'
+import { useAtom } from 'jotai'
+import Critical from '@/assets/icons/warning.svg'
+import Energy from '@/assets/icons/thunder.svg'
+import Image from 'next/image'
+import useFilterAssets from '@/components/TreeList/useFilterAssets'
 
 interface FilterButtonsProps {
-  assets: Asset[];
-  locations: Location[];
+  assets: Asset[]
+  locations: Location[]
 }
 
 export const FilterButtons = ({ assets, locations }: FilterButtonsProps) => {
-  const [filterByEnergy, setFilterByEnergy] = useAtom(filterByEnergyAtom);
-  const [filterByCritical, setFilterByCritical] = useAtom(filterByCriticalAtom);
+  const [filterByEnergy, setFilterByEnergy] = useAtom(filterByEnergyAtom)
+  const [filterByCritical, setFilterByCritical] = useAtom(filterByCriticalAtom)
 
   const {
     filterLocationByCritical,
     filterLocationBySensorType,
-    filterLocationOrAssetPerName,
+    filterLocationOrAssetPerName
   } = useFilterAssets({
     assets,
-    locations,
-  });
+    locations
+  })
 
   const handleFilterByEnergy = () => {
-    setFilterByEnergy(!filterByEnergy);
-    filterLocationBySensorType(!filterByEnergy);
-  };
+    setFilterByEnergy(!filterByEnergy)
+    filterLocationBySensorType(!filterByEnergy)
+  }
 
   const handleFilterByCritical = () => {
-    setFilterByCritical(!filterByCritical);
-    filterLocationByCritical(!filterByCritical);
-  };
+    setFilterByCritical(!filterByCritical)
+    filterLocationByCritical(!filterByCritical)
+  }
 
   return (
     <div className="flex gap-2 items-center justify-between">
       <input
-        className="p-2 w-full text-gray-900 rounded bg-gray-200 w-[40%] md:w-[50dvw] "
+        className="p-2 text-gray-900 rounded bg-gray-200 w-[40%] md:w-[50dvw] "
         onChange={(e) => filterLocationOrAssetPerName(e)}
         placeholder="Buscar ativo ou local"
         type="text"
@@ -52,7 +52,7 @@ export const FilterButtons = ({ assets, locations }: FilterButtonsProps) => {
           onClick={() => handleFilterByEnergy()}
           style={
             filterByEnergy
-              ? { backgroundColor: "rgb(29 78 216)", color: "white" }
+              ? { backgroundColor: 'rgb(29 78 216)', color: 'white' }
               : {}
           }
           title="energy"
@@ -67,7 +67,7 @@ export const FilterButtons = ({ assets, locations }: FilterButtonsProps) => {
           onClick={() => handleFilterByCritical()}
           style={
             filterByCritical
-              ? { backgroundColor: "rgb(29 78 216)", color: "white" }
+              ? { backgroundColor: 'rgb(29 78 216)', color: 'white' }
               : {}
           }
           title="critical"
@@ -76,12 +76,12 @@ export const FilterButtons = ({ assets, locations }: FilterButtonsProps) => {
             alt="critical"
             height={16}
             src={Critical}
-            style={filterByCritical ? { fill: "#fff" } : {}}
+            style={filterByCritical ? { fill: '#fff' } : {}}
             width={16}
           />
           Critico
         </button>
       </div>
     </div>
-  );
-};
+  )
+}

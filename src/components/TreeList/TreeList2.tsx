@@ -1,49 +1,40 @@
-"use client";
-import { useCallback } from "react";
-import AssetImg from "@/assets/icons/cube.svg";
-import ComponentImg from "@/assets/icons/box.svg";
-import DotGreen from "@/assets/icons/dot-green-mini.svg";
-import DotRed from "@/assets/icons/dot-red-mini.svg";
-import Energy from "@/assets/icons/thunder-mini.svg";
-import Image from "next/image";
-import LocationImg from "@/assets/icons/location.svg";
+'use client'
+import { Suspense, useCallback, useDeferredValue, useMemo } from 'react'
+import AssetImg from '@/assets/icons/cube.svg'
+import ComponentImg from '@/assets/icons/box.svg'
+import DotGreen from '@/assets/icons/dot-green-mini.svg'
+import DotRed from '@/assets/icons/dot-red-mini.svg'
+import Energy from '@/assets/icons/thunder-mini.svg'
+import Image from 'next/image'
+import LocationImg from '@/assets/icons/location.svg'
 
-import { Asset, Location } from "@/types/returnApiTypes";
-import { AssetWithLocation, LocationGroup, SubAsset } from "@/types/treeTypes";
-import { useTreeList } from "./useTreeList";
+import { Asset } from '@/types/returnApiTypes'
+import { AssetWithLocation, LocationGroup, SubAsset } from '@/types/treeTypes'
+import { useTreeList } from './useTreeList'
 
-import {
-  assetsFilteredAtom,
-  filterByCriticalAtom,
-  filterByEnergyAtom,
-  locationsFilteredAtom,
-} from "@/store/store";
-import { useAtom } from "jotai";
+import { assetsFilteredAtom, locationsFilteredAtom } from '@/store/store'
+import { useAtom } from 'jotai'
+import { RenderTree } from './RenderTree'
 
-interface TreeListProps {
-  assets: Asset[];
-  locations: Location[];
-}
+export const TreeList2 = () => {
+  console.time('begin tree2')
 
-export const TreeList2 = ({ assets, locations }: TreeListProps) => {
-  console.time("begin tree2");
-
-  const [locationsFiltered] = useAtom(locationsFilteredAtom);
-  const [assetsFiltered] = useAtom(assetsFilteredAtom);
+  const [locationsFiltered] = useAtom(locationsFilteredAtom)
+  const [assetsFiltered] = useAtom(assetsFilteredAtom)
 
   const { isolatedAssets, locations: treeLocations } = useTreeList({
     assets: assetsFiltered,
-    locations: locationsFiltered,
-  });
+    locations: locationsFiltered
+  })
 
   const renderAsset = useCallback((asset: Asset) => {
     return (
       <div
-        className={asset.sensorType ? "flex gap-2 ml-8" : "flex gap-2 ml-4"}
+        className={asset.sensorType ? 'flex gap-2 ml-8' : 'flex gap-2 ml-4'}
         key={asset.id}
       >
         <Image
-          alt={asset.sensorType ? "component" : "asset"}
+          alt={asset.sensorType ? 'component' : 'asset'}
           height={22}
           src={asset.sensorType ? ComponentImg : AssetImg}
           width={22}
@@ -51,18 +42,18 @@ export const TreeList2 = ({ assets, locations }: TreeListProps) => {
         <h3 className="flex gap-2">
           {asset.name}
           {asset.status &&
-            (asset.status === "alert" ? (
+            (asset.status === 'alert' ? (
               <Image alt="dot red" height={12} src={DotRed} width={12} />
             ) : (
               <Image alt="dot green" height={12} src={DotGreen} width={12} />
             ))}
-          {asset.sensorType && asset.sensorType === "energy" && (
+          {asset.sensorType && asset.sensorType === 'energy' && (
             <Image alt="energy" height={12} src={Energy} width={12} />
           )}
         </h3>
       </div>
-    );
-  }, []);
+    )
+  }, [])
 
   const renderAssets = useCallback(
     (assets: Asset[]) => {
@@ -74,10 +65,10 @@ export const TreeList2 = ({ assets, locations }: TreeListProps) => {
             </div>
           ))}
         </div>
-      );
+      )
     },
     [renderAsset]
-  );
+  )
 
   const renderSubAssets = useCallback(
     (assets: SubAsset[]) => {
@@ -90,10 +81,10 @@ export const TreeList2 = ({ assets, locations }: TreeListProps) => {
             </div>
           ))}
         </div>
-      );
+      )
     },
     [renderAsset, renderAssets]
-  );
+  )
 
   const renderAssetsWithLocation = useCallback(
     (assets: AssetWithLocation[]) => {
@@ -110,19 +101,19 @@ export const TreeList2 = ({ assets, locations }: TreeListProps) => {
             </div>
           ))}
         </div>
-      );
+      )
     },
     [renderAsset, renderAssets, renderSubAssets]
-  );
+  )
 
-  const renderTree = useCallback(
-    (location: LocationGroup[]) => {
+  const memoizedRenderTree = useMemo(() => {
+    const renderTree = (location: LocationGroup[]) => {
       return (
         <div>
           {location.map((location) => (
             <div key={location.location.id}>
               <div className="flex flex-col ml-2">
-                <div className="flex gap-2 ">
+                <div className="flex gap-2">
                   <Image
                     alt="location"
                     height={22}
@@ -138,18 +129,23 @@ export const TreeList2 = ({ assets, locations }: TreeListProps) => {
             </div>
           ))}
         </div>
-      );
-    },
-    [renderAssets, renderAssetsWithLocation]
-  );
-  console.timeEnd("begin tree2");
+      )
+    }
+    return renderTree
+  }, [renderAssets, renderAssetsWithLocation])
+
+  console.timeEnd('begin tree2')
   return (
     <div
       className="flex flex-col p-4 gap-4
     rounded min-h-[80dvh] bg-gray-600 w-[40%] md:w-[50dvw] "
     >
       <div className="flex flex-col">
-        {renderTree(treeLocations)}
+        <RenderTree
+          location={treeLocations}
+          renderAssets={renderAssets}
+          renderAssetsWithLocation={renderAssetsWithLocation}
+        />
         <div>
           {isolatedAssets.map((asset) => (
             <div className="flex gap-2 p-2" key={asset.id}>
@@ -157,8 +153,7 @@ export const TreeList2 = ({ assets, locations }: TreeListProps) => {
             </div>
           ))}
         </div>
-        <pre>{/*JSON.stringify(treeList, null, 2)*/}</pre>
       </div>
     </div>
-  );
-};
+  )
+}

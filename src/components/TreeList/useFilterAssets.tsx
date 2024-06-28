@@ -14,9 +14,6 @@ interface FilterProps {
 }
 
 const useFilterAssets = ({ assets, locations }: FilterProps) => {
-  /* const [locationsFiltered, setLocationsFiltered] =
-    useState<Location[]>(locations); */
-  // const [assetsFiltered, setAssetsFiltered] = useState<Asset[]>(assets);
   const [locationsFiltered, setLocationsFiltered] = useAtom(
     locationsFilteredAtom
   )
@@ -27,12 +24,17 @@ const useFilterAssets = ({ assets, locations }: FilterProps) => {
     setLocationsFiltered(locations)
   }, [assets, locations, setAssetsFiltered, setLocationsFiltered])
 
-  useEffect(() => {
-    console.log('aqui', assetsFiltered)
-  }, [assetsFiltered, locationsFiltered])
+  const [, setFilterByCritical] = useAtom(filterByCriticalAtom)
+  const [, setFilterByEnergy] = useAtom(filterByEnergyAtom)
 
-  const [filterByCritical, setFilterByCritical] = useAtom(filterByCriticalAtom)
-  const [filterByEnergy, setFilterByEnergy] = useAtom(filterByEnergyAtom)
+  const resetfilters = () => {
+    setFilterByCritical(false)
+    setFilterByEnergy(false)
+  }
+
+  useEffect(() => {
+    resetfilters()
+  }, [])
 
   const filterAssets = (value: string) => {
     const lowerCaseValue = value.toLowerCase()
