@@ -20,7 +20,8 @@ export const returnLocations = async (id: string): Promise<Location[]> => {
       headers: {
         'Content-Type': 'application/json'
       },
-      method: 'GET'
+      method: 'GET',
+      cache: 'no-store'
     }
   )
   const data = await response.json()
@@ -28,14 +29,14 @@ export const returnLocations = async (id: string): Promise<Location[]> => {
 }
 
 export const returnAssets = async (id: string): Promise<Asset[]> => {
-  console.time('demora2')
   const response = await fetch(
     `https://fake-api.tractian.com/companies/${id}/assets`,
     {
       headers: {
         'Content-Type': 'application/json'
       },
-      method: 'GET'
+      method: 'GET',
+      cache: 'no-store'
     }
   )
   const data = await response.json()

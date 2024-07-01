@@ -264,7 +264,6 @@ const useFilterAssets = ({ assets, locations }: FilterProps) => {
 
         setAssetsFiltered(finalFilteredAssets)
         setLocationsFiltered(finalFilteredLocations)
-        // TODO : improve this code
       } else {
         resetfilters()
         setAssetsFiltered(assets)

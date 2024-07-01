@@ -1,5 +1,5 @@
 import { FilterButtons } from '@/components/FilterButtons/FilterButtons'
-import { TreeList2 } from '@/components/TreeList/TreeList2'
+import { TreeList } from '@/components/TreeList/TreeList'
 
 import { Suspense } from 'react'
 import { returnAssets, returnLocations } from '@/services/apiTractian'
@@ -9,7 +9,7 @@ interface PageProps {
   params: { id: string }
 }
 
-export default async function CustomersPage({ params }: PageProps) {
+export default async function Page({ params }: PageProps) {
   const locations = await returnLocations(params.id)
   const assets = await returnAssets(params.id)
 
@@ -22,7 +22,7 @@ export default async function CustomersPage({ params }: PageProps) {
             <div className="w-full text-yellow-500 font-bold">Loading...</div>
           }
         >
-          <TreeList2 />
+          <TreeList />
         </Suspense>
         <AssetDetails />
       </div>

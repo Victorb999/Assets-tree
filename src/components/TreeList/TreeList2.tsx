@@ -6,23 +6,16 @@ import LocationImg from '@/assets/icons/location.svg'
 
 import { Asset } from '@/types/returnApiTypes'
 import { AssetWithLocation, LocationGroup, SubAsset } from '@/types/treeTypes'
-import { useTreeList } from './useTreeList'
-
-import { assetsFilteredAtom, locationsFilteredAtom } from '@/store/store'
-import { useAtom } from 'jotai'
 
 import { AssetItem } from '@/components/AssetItem/AssetItem'
 
-export const TreeList2 = () => {
-  console.time('begin tree2')
+interface TreeListProps {
+  isolatedAssets: Asset[]
+  treeLocations: LocationGroup[]
+}
 
-  const [locationsFiltered] = useAtom(locationsFilteredAtom)
-  const [assetsFiltered] = useAtom(assetsFilteredAtom)
-
-  const { isolatedAssets, locations: treeLocations } = useTreeList({
-    assets: assetsFiltered,
-    locations: locationsFiltered
-  })
+const TreeList2 = ({ isolatedAssets, treeLocations }: TreeListProps) => {
+  console.time('begin tree22')
 
   const renderAssets = useCallback((assets: Asset[]) => {
     return (
@@ -75,7 +68,7 @@ export const TreeList2 = () => {
   const memoizedRenderTree = useMemo(() => {
     const renderTree = (location: LocationGroup[]) => {
       return (
-        <div>
+        <>
           {location.map((location) => (
             <div key={location.location.id}>
               <div className="flex flex-col ml-2">
@@ -94,7 +87,7 @@ export const TreeList2 = () => {
               </div>
             </div>
           ))}
-        </div>
+        </>
       )
     }
     return renderTree
@@ -107,7 +100,21 @@ export const TreeList2 = () => {
   // Fechar combo
   // video
 
-  console.timeEnd('begin tree2')
+  console.timeEnd('begin tree22')
+
+  if (treeLocations.length === 0)
+    return (
+      <div
+        className="flex flex-col p-4 gap-4
+      rounded min-h-[80dvh] w-[40%] md:w-[50dvw] border border-gray-700"
+      >
+        <h1 className="text-2xl">Ops...</h1>
+        <span>
+          Não foi encontrado nenhum ativo ou local. Tente mudar o filtro ou
+          pesquisar novamente.
+        </span>
+      </div>
+    )
   return (
     <main
       className="flex flex-col p-4 gap-4
@@ -126,3 +133,5 @@ export const TreeList2 = () => {
     </main>
   )
 }
+
+export default TreeList2
