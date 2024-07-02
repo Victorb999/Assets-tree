@@ -2,13 +2,13 @@
 import { assetSelectedAtom } from '@/store/store'
 import { useAtom } from 'jotai'
 
+import DefaultImg from '@/assets/img/default-img.svg'
 import DotGreen from '@/assets/icons/dot-green-mini.svg'
 import DotRed from '@/assets/icons/dot-red-mini.svg'
-import Sensor from '@/assets/icons/sensor.svg'
-import Receptor from '@/assets/icons/router.svg'
-import DefaultImg from '@/assets/img/default-img.svg'
 import Energy from '@/assets/icons/thunder-mini.svg'
 import Image from 'next/image'
+import Receptor from '@/assets/icons/router.svg'
+import Sensor from '@/assets/icons/sensor.svg'
 
 export const AssetDetails = () => {
   const [assetSelected] = useAtom(assetSelectedAtom)

@@ -1,199 +1,145 @@
 'use client'
-import { ChangeEvent, useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
+
 import Image from 'next/image'
+import LocationImg from '@/assets/icons/location.svg'
 
 import { Asset, Location } from '@/types/returnApiTypes'
-import AssetImg from '@/assets/icons/cube.svg'
-import ComponentImg from '@/assets/icons/box.svg'
-import LocationImg from '@/assets/icons/location.svg'
-import useFilterAssets from './useFilterAssets'
+import { AssetWithLocation, LocationGroup, SubAsset } from '@/types/treeTypes'
+import { useTreeList } from './useTreeList'
+
+import { AssetItem } from '@/components/AssetItem/AssetItem'
 
 interface TreeListProps {
-  assets: Asset[]
-  locations: Location[]
+  assetsFiltered: Asset[]
+  locationsFiltered: Location[]
 }
 
-export const TreeList = ({ assets, locations }: TreeListProps) => {
-  const { assetsFiltered, filterLocationOrAssetPerName, locationsFiltered } =
-    useFilterAssets({ assets, locations })
+export default function TreeList({
+  assetsFiltered,
+  locationsFiltered
+}: TreeListProps) {
+  const { isolatedAssets, locations: treeLocations } = useTreeList({
+    assets: assetsFiltered,
+    locations: locationsFiltered
+  })
 
-  /*   console.log(locationsFiltered);
-  console.log(assetsFiltered);
- */
-  const renderAsset = useCallback((asset: Asset) => {
+  useEffect(() => {
+    console.log('renderizaçao', assetsFiltered.length)
+  }, [assetsFiltered])
+
+  const renderAssets = useCallback((assets: Asset[]) => {
     return (
-      <div key={asset.id}>
-        <div className="flex gap-2 pl-4">
-          <Image
-            alt={asset.sensorType ? 'component' : 'asset'}
-            height={22}
-            src={asset.sensorType ? ComponentImg : AssetImg}
-            title={`id: ${asset.id} / parentId: ${asset.parentId} / locationId: ${asset.locationId}`}
-            width={22}
-          />
-          <h3>{asset.name}</h3>
-        </div>
+      <div>
+        {assets.map((asset) => (
+          <div className="flex gap-2 ml-4" key={asset.id}>
+            <AssetItem asset={asset} />
+          </div>
+        ))}
       </div>
     )
   }, [])
 
-  const returnIsolatedAssets = () => {
-    return (
-      <div>
-        {assetsFiltered
-          .filter((asset) => !asset.locationId && !asset.parentId)
-          .map((asset) => (
-            <div key={asset.id}>
-              <div className="flex gap-2 p-2">{renderAsset(asset)}</div>
+  const renderSubAssets = useCallback(
+    (assets: SubAsset[]) => {
+      return (
+        <div>
+          {assets.map((asset) => (
+            <div className="flex flex-col ml-4" key={asset.subAsset.id}>
+              <AssetItem asset={asset.subAsset} />
+              {renderAssets(asset.componentWithAssets)}
             </div>
           ))}
+        </div>
+      )
+    },
+    [renderAssets]
+  )
+
+  const renderAssetsWithLocation = useCallback(
+    (assets: AssetWithLocation[]) => {
+      return (
+        <div>
+          {assets.map((asset) => (
+            <div
+              className="flex flex-col ml-4"
+              key={asset.assetWithLocation.id}
+            >
+              <AssetItem asset={asset.assetWithLocation} />
+              {renderSubAssets(asset.subAssets)}
+              {renderAssets(asset.componentWithAssets)}
+            </div>
+          ))}
+        </div>
+      )
+    },
+    [renderAssets, renderSubAssets]
+  )
+
+  const memoizedRenderTree = useMemo(() => {
+    const renderTree = (location: LocationGroup[]) => {
+      return (
+        <>
+          {location.map((location) => (
+            <div key={location.location.id}>
+              <div className="flex flex-col ml-2">
+                <div className="flex gap-2">
+                  <Image
+                    alt="location"
+                    height={22}
+                    src={LocationImg}
+                    width={22}
+                  />
+                  <h3>{location.location.name}</h3>
+                </div>
+                {renderTree(location.sublocations)}
+                {renderAssetsWithLocation(location.assetsWithLocation)}
+                {renderAssets(location.componentWithAssets)}
+              </div>
+            </div>
+          ))}
+        </>
+      )
+    }
+    return renderTree
+  }, [renderAssets, renderAssetsWithLocation])
+
+  // TODO :
+  // LOADINGS e msg de nenhum asset
+  // performace
+  // tela inicial
+  // Fechar combo
+  // video
+
+  if (treeLocations.length === 0)
+    return (
+      <div
+        className="flex flex-col p-4 gap-4
+      rounded min-h-[80dvh] w-[40%] md:w-[50dvw] border border-gray-700"
+      >
+        <h1 className="text-2xl">Ops...</h1>
+        <span>
+          Não foi encontrado nenhum ativo ou local. Tente mudar o filtro ou
+          pesquisar novamente.
+        </span>
       </div>
     )
-  }
 
-  const returnComponentLocation = useCallback(
-    (locationId: string) => {
-      return (
+  return (
+    <main
+      className="flex flex-col p-4 gap-4
+    rounded min-h-[80dvh] w-[40%] md:w-[50dvw] border border-gray-700"
+    >
+      <div className="flex flex-col">
         <div>
-          {assetsFiltered
-            .filter(
-              (asset) => asset.sensorType && asset.locationId === locationId
-            )
-            .map((asset) => (
-              <div key={asset.id}>
-                <div className="flex gap-2 ml-8 border-l-2 border-gray-600">
-                  {renderAsset(asset)}
-                </div>
-              </div>
-            ))}
-        </div>
-      )
-    },
-    [assetsFiltered, renderAsset]
-  )
-
-  const returnComponentAssets = useCallback(
-    (assetId: string) => {
-      return (
-        <div>
-          {assetsFiltered
-            .filter((asset) => asset.sensorType && asset.parentId === assetId)
-            .map((asset) => (
-              <div key={asset.id}>
-                <div className="flex gap-2 ml-8 border-l-2 border-gray-600">
-                  {renderAsset(asset)}
-                </div>
-              </div>
-            ))}
-        </div>
-      )
-    },
-    [assetsFiltered, renderAsset]
-  )
-
-  const returnSubAssets = useCallback(
-    (assetId: string) => {
-      return (
-        <div>
-          {assetsFiltered
-            .filter((asset) => asset.parentId === assetId && !asset.sensorId)
-            .map((asset) => (
-              <div key={asset.id}>
-                <div className="flex gap-2 ml-8 border-l-2 border-gray-600">
-                  {renderAsset(asset)}
-                </div>
-                <div className="ml-12">{returnComponentAssets(asset.id)}</div>
-              </div>
-            ))}
-        </div>
-      )
-    },
-    [assetsFiltered, renderAsset, returnComponentAssets]
-  )
-
-  const returnLocationAsset = useCallback(
-    (idLocation: string) => {
-      return (
-        <div>
-          {assetsFiltered
-            .filter(
-              (asset) => asset.locationId === idLocation && !asset.sensorId
-            )
-            .map((asset) => (
-              <div key={asset.id}>
-                <div className="ml-4 border-l-2 border-gray-600">
-                  {renderAsset(asset)}
-                </div>
-                {returnSubAssets(asset.id)}
-                {returnComponentAssets(asset.id)}
-              </div>
-            ))}
-        </div>
-      )
-    },
-    [assetsFiltered, renderAsset, returnSubAssets, returnComponentAssets]
-  )
-
-  const memoizedTree = useMemo(() => {
-    const cache: Record<string, JSX.Element> = {}
-    const generateTree = (parentId: string | null): JSX.Element => {
-      if (cache[parentId || 'root']) {
-        return cache[parentId || 'root']
-      }
-
-      const locationsTree = locationsFiltered.filter(
-        (location) => location.parentId === parentId
-      )
-
-      const result = (
-        <div>
-          {locationsTree.map((location) => (
-            <div
-              className={
-                location.parentId
-                  ? 'p-2 ml-4 border-l-2 border-gray-600'
-                  : 'pl-2'
-              }
-              key={location.id}
-            >
-              <div className="flex gap-2">
-                <Image
-                  alt="location"
-                  height={22}
-                  src={LocationImg}
-                  title={`id: ${location.id} - 
-                  parentId: ${location.parentId} `}
-                  width={22}
-                />
-                <h3>{location.name}</h3>
-              </div>
-              {generateTree(location.id)}
-              {returnLocationAsset(location.id)}
-              {returnComponentLocation(location.id)}
+          <pre>{memoizedRenderTree(treeLocations)}</pre>
+          {isolatedAssets.map((asset) => (
+            <div className="flex gap-2 p-2" key={asset.id}>
+              <AssetItem asset={asset} />
             </div>
           ))}
         </div>
-      )
-
-      cache[parentId || 'root'] = result
-      return result
-    }
-
-    return generateTree(null)
-  }, [returnComponentLocation, returnLocationAsset, locationsFiltered])
-
-  return (
-    <div className="flex flex-col">
-      <input
-        className="w-[25%] md:w-[40dvw] text-gray-900"
-        onChange={(e) => filterLocationOrAssetPerName(e)}
-        placeholder="Buscar ativo ou local"
-        type="text"
-      />
-      <div className="p-4 rounded min-h-[80dvh] bg-gray-400 w-[25%] md:w-[40dvw]">
-        {memoizedTree}
-        {returnIsolatedAssets()}
       </div>
-    </div>
+    </main>
   )
 }
