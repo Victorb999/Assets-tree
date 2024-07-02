@@ -20,23 +20,19 @@ const useFilterAssets = ({ assets, locations }: FilterProps) => {
   )
   const [assetsFiltered, setAssetsFiltered] = useAtom(assetsFilteredAtom)
   const [, setAssetSelected] = useAtom(assetSelectedAtom)
-  useEffect(() => {
-    setAssetsFiltered(assets)
-    setLocationsFiltered(locations)
-  }, [assets, locations, setAssetsFiltered, setLocationsFiltered])
 
   const [, setFilterByCritical] = useAtom(filterByCriticalAtom)
   const [, setFilterByEnergy] = useAtom(filterByEnergyAtom)
 
-  const resetfilters = () => {
+  const resetfilters = useCallback(() => {
     setFilterByCritical(false)
     setFilterByEnergy(false)
     setAssetSelected(null)
-  }
+  }, [setAssetSelected, setFilterByCritical, setFilterByEnergy])
 
   useEffect(() => {
     resetfilters()
-  }, [])
+  }, [resetfilters])
 
   const filterAssets = (value: string) => {
     const lowerCaseValue = value.toLowerCase()

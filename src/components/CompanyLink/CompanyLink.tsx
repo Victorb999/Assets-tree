@@ -1,6 +1,5 @@
 'use client'
 import Image from 'next/image'
-import Link from 'next/link'
 
 import { usePathname } from 'next/navigation'
 import Gold from '@/assets/icons/gold.svg'
@@ -15,12 +14,12 @@ export const CompanyLink = ({ company }: CompanyLinkProps) => {
   const idSelected = usePathname().split('/')[2] ?? ''
 
   return (
-    <Link
+    <a
       className="flex gap-2 items-center p-2
      text-white rounded bg-blue-900 
      hover:bg-blue-800
      active:bg-blue-700"
-      href={`/json/${company.id}`}
+      href={`/company/${company.id}`}
       id={company.id}
       key={company.id}
       style={
@@ -31,6 +30,6 @@ export const CompanyLink = ({ company }: CompanyLinkProps) => {
     >
       <Image alt="gold  icon" height={14} src={Gold} width={14} />
       {company.name}
-    </Link>
+    </a>
   )
 }

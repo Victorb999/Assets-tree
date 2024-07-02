@@ -1,28 +1,32 @@
 'use client'
-import { useCallback, useMemo } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 
 import Image from 'next/image'
 import LocationImg from '@/assets/icons/location.svg'
 
-import { Asset } from '@/types/returnApiTypes'
+import { Asset, Location } from '@/types/returnApiTypes'
 import { AssetWithLocation, LocationGroup, SubAsset } from '@/types/treeTypes'
 import { useTreeList } from './useTreeList'
 
-import { assetsFilteredAtom, locationsFilteredAtom } from '@/store/store'
-import { useAtom } from 'jotai'
-
 import { AssetItem } from '@/components/AssetItem/AssetItem'
 
-export const TreeList = () => {
-  console.time('begin tree2')
+interface TreeListProps {
+  assetsFiltered: Asset[]
+  locationsFiltered: Location[]
+}
 
-  const [locationsFiltered] = useAtom(locationsFilteredAtom)
-  const [assetsFiltered] = useAtom(assetsFilteredAtom)
-
+export default function TreeList({
+  assetsFiltered,
+  locationsFiltered
+}: TreeListProps) {
   const { isolatedAssets, locations: treeLocations } = useTreeList({
     assets: assetsFiltered,
     locations: locationsFiltered
   })
+
+  useEffect(() => {
+    console.log('renderizaçao', assetsFiltered.length)
+  }, [assetsFiltered])
 
   const renderAssets = useCallback((assets: Asset[]) => {
     return (
@@ -107,8 +111,6 @@ export const TreeList = () => {
   // Fechar combo
   // video
 
-  console.timeEnd('begin tree2')
-
   if (treeLocations.length === 0)
     return (
       <div
@@ -122,14 +124,15 @@ export const TreeList = () => {
         </span>
       </div>
     )
+
   return (
     <main
       className="flex flex-col p-4 gap-4
     rounded min-h-[80dvh] w-[40%] md:w-[50dvw] border border-gray-700"
     >
       <div className="flex flex-col">
-        {memoizedRenderTree(treeLocations)}
         <div>
+          <pre>{memoizedRenderTree(treeLocations)}</pre>
           {isolatedAssets.map((asset) => (
             <div className="flex gap-2 p-2" key={asset.id}>
               <AssetItem asset={asset} />
