@@ -210,6 +210,7 @@ const useFilterAssets = ({ assets, locations }: FilterProps) => {
         const filteredAssets = assetsFiltered.filter(
           (asset) => asset.sensorType === `energy`
         )
+        console.log(filteredAssets)
         collectRelatedIds(filteredAssets, [], idsToShow)
 
         let foundNewIds

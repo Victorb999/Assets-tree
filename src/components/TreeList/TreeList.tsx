@@ -104,11 +104,7 @@ export default function TreeList({
     return renderTree
   }, [renderAssets, renderAssetsWithLocation])
 
-  // TODO :
-  // Fechar combo
-  // video
-
-  if (treeLocations.length === 0)
+  if (treeLocations.length === 0 && isolatedAssets.length === 0)
     return (
       <div
         className="flex flex-col p-4 gap-4
