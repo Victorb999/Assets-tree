@@ -5,7 +5,7 @@ import { useAtom } from 'jotai'
 import Critical from '@/assets/icons/warning.svg'
 import Energy from '@/assets/icons/thunder.svg'
 import Image from 'next/image'
-import useFilterAssets from '@/components/TreeList/useFilterAssets'
+import useFilterAssets from '@/hooks/useFilterAssets'
 
 interface FilterButtonsProps {
   assets: Asset[]

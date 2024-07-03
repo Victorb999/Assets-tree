@@ -1,29 +1,29 @@
 'use client'
 import { Asset } from '@/types/returnApiTypes'
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 
-import ComponentImg from '@/assets/icons/cube.svg'
+import { assetSelectedAtom } from '@/store/store'
+import { useAtom } from 'jotai'
 import AssetImg from '@/assets/icons/box.png'
 import AssetSelectedImg from '@/assets/icons/box-white.png'
+import ComponentImg from '@/assets/icons/cube.svg'
 import DotGreen from '@/assets/icons/dot-green-mini.svg'
 import DotRed from '@/assets/icons/dot-red-mini.svg'
 import Energy from '@/assets/icons/thunder-mini.svg'
 import Image from 'next/image'
-import { assetSelectedAtom } from '@/store/store'
-import { useAtom } from 'jotai'
 
 interface AssetItemProps {
   asset: Asset
 }
 export const AssetItem = ({ asset }: AssetItemProps) => {
   const [assetSelected, setAssetSelected] = useAtom(assetSelectedAtom)
-  const handleSelectedAsset = () => {
+  const handleSelectedAsset = useCallback(() => {
     if (asset.sensorType) {
       if (asset.id === assetSelected?.id) {
         setAssetSelected(null)
       } else setAssetSelected(asset)
     }
-  }
+  }, [asset, assetSelected?.id, setAssetSelected])
 
   const renderAsset = useMemo(() => {
     const classNameAsset =
@@ -69,7 +69,16 @@ export const AssetItem = ({ asset }: AssetItemProps) => {
         </h3>
       </div>
     )
-  }, [assetSelected])
+  }, [
+    asset.id,
+    asset.locationId,
+    asset.name,
+    asset.parentId,
+    asset.sensorType,
+    asset.status,
+    assetSelected?.id,
+    handleSelectedAsset
+  ])
 
   return <>{renderAsset}</>
 }

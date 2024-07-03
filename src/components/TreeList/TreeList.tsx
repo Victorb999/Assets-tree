@@ -6,7 +6,7 @@ import LocationImg from '@/assets/icons/location.svg'
 
 import { Asset, Location } from '@/types/returnApiTypes'
 import { AssetWithLocation, LocationGroup, SubAsset } from '@/types/treeTypes'
-import { useTreeList } from './useTreeList'
+import { useTreeList } from '@/hooks/useTreeList'
 
 import { AssetItem } from '@/components/AssetItem/AssetItem'
 
@@ -105,9 +105,6 @@ export default function TreeList({
   }, [renderAssets, renderAssetsWithLocation])
 
   // TODO :
-  // LOADINGS e msg de nenhum asset
-  // performace
-  // tela inicial
   // Fechar combo
   // video
 

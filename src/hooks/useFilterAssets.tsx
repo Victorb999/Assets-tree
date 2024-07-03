@@ -34,19 +34,25 @@ const useFilterAssets = ({ assets, locations }: FilterProps) => {
     resetfilters()
   }, [resetfilters])
 
-  const filterAssets = (value: string) => {
-    const lowerCaseValue = value.toLowerCase()
-    return assets.filter((asset) =>
-      asset.name.toLowerCase().includes(lowerCaseValue)
-    )
-  }
+  const filterAssets = useCallback(
+    (value: string) => {
+      const lowerCaseValue = value.toLowerCase()
+      return assets.filter((asset) =>
+        asset.name.toLowerCase().includes(lowerCaseValue)
+      )
+    },
+    [assets]
+  )
 
-  const filterLocations = (value: string) => {
-    const lowerCaseValue = value.toLowerCase()
-    return locations.filter((location) =>
-      location.name.toLowerCase().includes(lowerCaseValue)
-    )
-  }
+  const filterLocations = useCallback(
+    (value: string) => {
+      const lowerCaseValue = value.toLowerCase()
+      return locations.filter((location) =>
+        location.name.toLowerCase().includes(lowerCaseValue)
+      )
+    },
+    [locations]
+  )
 
   const collectRelatedIds = useCallback(
     (
@@ -191,6 +197,7 @@ const useFilterAssets = ({ assets, locations }: FilterProps) => {
       filterLocations,
       findParentsAssets,
       locations,
+      setAssetSelected,
       setAssetsFiltered,
       setLocationsFiltered
     ]
@@ -233,7 +240,7 @@ const useFilterAssets = ({ assets, locations }: FilterProps) => {
       setAssetsFiltered,
       setLocationsFiltered,
       findParentsAssetsButNotBrothers,
-      setFilterByCritical
+      resetfilters
     ]
   )
 
@@ -274,7 +281,7 @@ const useFilterAssets = ({ assets, locations }: FilterProps) => {
       setAssetsFiltered,
       setLocationsFiltered,
       findParentsAssetsButNotBrothers,
-      setFilterByEnergy
+      resetfilters
     ]
   )
 
